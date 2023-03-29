@@ -421,35 +421,34 @@ The type should be string.
 Target device to use, which must be one of "cpu", "gpu", "cuda".
 
 # Open Source License Notice
-@<p>
 @<b>Apache TVM@</b>
-@<link:https://github.com/apache/tvm;https://github.com/apache/tvm>
-Apache 2.0 License@</p>
+* @<link:https://github.com/apache/tvm;https://github.com/apache/tvm>
+* Apache 2.0 License
+ 
 
-@<p>
 @<b>PyTorch@</b>
-@<link:https://github.com/pytorch/pytorch;https://github.com/pytorch/pytorch>
-BSD-like License@</p>
+* @<link:https://github.com/pytorch/pytorch;https://github.com/pytorch/pytorch>
+* BSD-like License
+ 
 
-@<p>
 @<b>TensorFlow@</b>
-@<link:https://github.com/tensorflow/tensorflow;https://github.com/tensorflow/tensorflow>
-Apache 2.0 License@</p>
+* @<link:https://github.com/tensorflow/tensorflow;https://github.com/tensorflow/tensorflow>
+* Apache 2.0 License
+ 
 
-@<p>
 @<b>ONNX@</b>
-@<link:https://github.com/onnx/onnx;https://github.com/onnx/onnx>
-Apache 2.0 License@</p>
+* @<link:https://github.com/onnx/onnx;https://github.com/onnx/onnx>
+* Apache 2.0 License
+ 
 
-@<p>
 @<b>ONNX Runtime@</b>
-@<link:https://github.com/microsoft/onnxruntime;https://github.com/microsoft/onnxruntime>
-MIT License@</p>
+* @<link:https://github.com/microsoft/onnxruntime;https://github.com/microsoft/onnxruntime>
+* MIT License
+ 
 
-@<p>
 @<b>Keras@</b>
-@<link:https://github.com/keras-team/keras;https://github.com/keras-team/keras>
-Apache 2.0 License@</p>
+* @<link:https://github.com/keras-team/keras;https://github.com/keras-team/keras>
+* Apache 2.0 License
 
 # Copyright
 Copyrightⓒ 2019-present, Mobilint, Inc. All rights reserved.
