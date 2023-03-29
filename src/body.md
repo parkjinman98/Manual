@@ -282,7 +282,7 @@ This class serves two main functions: <br>
 2. Inference (Note that this inference is done by CPU or GPU testing.) <br>
 
 @<tbl:media/class_model_dict.xlsx;Sheet1;Model_Dict Class>
-## Method detail
+## Method details
 @<tbl:media/method_details.xlsx;Sheet1;Method detail>
 ### `__init__`
 * Parameters
@@ -292,8 +292,10 @@ Model
 The type should be string or model instance.
 
 Model path or model instance. Model should be instance for the following cases:
+Using backend="onnx" and a onnx model path
 Using backend="tvm" and a Keras model
 Using backend="tvm" and a PyTorch model
+Using backend="tf" and a fronzen TensorFlow PB graph
 
 ```python
 backend
@@ -313,6 +315,13 @@ input_shape
 The type should be tuple or list.
 
 Input shape in HWC. Necessary only for using PyTorch model and backend="tvm".
+
+```python
+device
+```
+The type should be string.
+
+Device to be used for compile and inerence. Either cpu or gpu.
 
 ### compile
 * Parameters
