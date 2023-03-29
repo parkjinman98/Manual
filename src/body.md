@@ -268,9 +268,9 @@ mxq_compile(
 ```
 # CPU Offloading
 
-From qubee v0.7, we support CPU offloading for mxq compile.
-CPU offloading makes it easier for users to compile their models by automatically offloading the computation to the CPU, even if the model contains operations that are not supported by Mobilint NPU.
-For example, if a preprocessing or postprocessing function used in deep learning involves operations that are not supported by the NPU, the user would have to implement them manually, but CPU offloading covers most of these operations and eliminates the need for additional work.
+From qubee v0.7, we provide Beta version of CPU offloading for mxq compile. CPU offloading makes it easier for users to compile their models by automatically offloading the computation to the CPU, even if the model contains operations that are not supported by Mobilint NPU. For example, if a preprocessing or postprocessing function used in deep learning involves operations that are not supported by the NPU, the user would have to implement them manually, but CPU offloading covers most of these operations and eliminates the need for additional work.
+
+
 
 # Supported Frameworks
  We support almost all the commonly used Machine Learning frameworks & libraries, \
