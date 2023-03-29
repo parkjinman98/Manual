@@ -54,24 +54,26 @@ First release
  In order to use the qubee, the NVIDIA GPU is required. CPU version qubee will \
 be provided in the future.
 
-* Reference System
+### Reference System
 ```vim
 Ubuntu 18.04.6 LTS
 NVIDIA Graphics Driver 465.19.01
 ```
+ 
 
-* Requirement packages
+### Requirement Packages
 ```vim
 NVIDIA Graphics Driver 450.80.02 or Above
 Docker
 nvidia-docker
 ```
+ 
 
-## SDK installation
+## SDK Installation
  We recommend installing qubee on the mobilint docker container. \
 (Docker image: mobilint/qbcompiler:v0.4, @<link:https://hub.docker.com/r/mobilint/qbcompiler;https://hub.docker.com/r/mobilint/qbcompiler>)
 
-### Building docker image
+### Building Docker Image
 Run the following commands to build the docker image.
 ```bash
 $ # Docker image download
@@ -80,7 +82,8 @@ $ # Make a docker container
 $ docker run -it --gpus all --name mxq_compiler -v $(pwd):/data mobilint/qbcompiler:v0.6
 ```
 
-### installation of qubee
+
+### Installation of qubee
  Run the following commands to install qubee on the docker container.
 ```bash
 $ # Download qubee-0.7-py3-none-any.whl file
@@ -98,7 +101,7 @@ $ python -m pip install qubee-0.7-py3-none-any.whl
  The tutorials below go through preparing calibration dataset, model compile \
 and inference steps.
 
-## Preparing calibration data
+## Preparing Calibration Data
  This step makes calibration data txt file for quantization. This step is \
 required before compiling the model.
 
@@ -132,8 +135,9 @@ SetOrder:
 ```
 
  The above results calibration meta txt file “/workspace/calibration/calib_imagenet_mobilenet_v3.txt”.
+ 
 
-## Compiling ONNX models
+## Compiling ONNX Models
  ONNX model can be parsed in two different ways. The first one just directly \
 parses the ONNX model, converts it to Mobilint IR. The second one converts the \
 ONNX model to TVM, parses it, and converts it to Mobilint IR. Once the model is \
@@ -165,8 +169,9 @@ mxq_compile(
     backend="tvm"
 )
 ```
+ 
 
-## Compiling PyTorch models
+## Compiling PyTorch Models
  PyTorch model can be parsed in two different ways. First, one converts to ONNX, \
 parses it, and converts to Mobilint IR. The second one converts to TVM, parses it, \
 and converts to Mobilint IR. Once the model is converted to Mobilint IR, then it \
@@ -208,8 +213,9 @@ mxq_compile(
     input_shape=(224, 224, 3)
 )
 ```
+ 
 
-## Compiling Keras models
+## Compiling Keras Models
  Keras model will be to TVM, which will be parsed and converted to Mobilint IR. \
 Once the model is converted to Mobilint IR, then it will be compiled into MXQ.
 
@@ -229,8 +235,9 @@ mxq_compile(
     input_shape=(224, 224, 3)
 )
 ```
+ 
 
-## Compiling TensorFlow models
+## Compiling TensorFlow Models
  qubee supports TensorFlow up to version 1.15. So, it requires a frozen \
 TensorFlow PB graph as input, which will be parsed and converted to Mobilint IR. \
 Once the model is converted to Mobilint IR, then it will be compiled into MXQ.
@@ -259,6 +266,11 @@ mxq_compile(
     input_shape=(224, 224, 3)
 )
 ```
+# CPU Offloading
+
+From qubee v0.7, we support CPU offloading for mxq compile.
+CPU offloading makes it easier for users to compile their models by automatically offloading the computation to the CPU, even if the model contains operations that are not supported by Mobilint NPU.
+For example, if a preprocessing or postprocessing function used in deep learning involves operations that are not supported by the NPU, the user would have to implement them manually, but CPU offloading covers most of these operations and eliminates the need for additional work.
 
 # Supported Frameworks
  We support almost all the commonly used Machine Learning frameworks & libraries, \
@@ -266,7 +278,7 @@ such as ONNX, TVM, PyTorch, Keras, and TensorFlow.
 
 @<img:#media/supported_frameworks.png;1.0;Supported deep-learning frameworks>
 
-## Supported operations (ONNX)
+## Supported Operations (ONNX)
 @<tbl:media/supported_onnx.xlsx;Sheet1;ONNX Supported Operations>
 ## Supported operations (PyTorch)
 @<tbl:media/supported_pytorch.xlsx;Sheet1;PyTorch Supported Operations>
@@ -276,172 +288,76 @@ such as ONNX, TVM, PyTorch, Keras, and TensorFlow.
 @<tbl:media/supported_keras.xlsx;Sheet1;Keras Supported Operation>
 
 # API Reference
-## Model_Dict Class
-This class serves two main functions: <br>
-1. Compile <br>
-2. Inference (Note that this inference is done by CPU or GPU testing.) <br>
+## Class: Model_Dict
+This class serves two main functions:
+1. Compile
+2. Inference (Note that this inference is done by CPU or GPU.)
 
 @<tbl:media/class_model_dict.xlsx;Sheet1;Model_Dict Class>
-## Method details
-@<tbl:media/method_details.xlsx;Sheet1;Method detail>
-### `__init__`
-* Parameters
-```python
-Model
+ 
+### Methods
+@<tbl:media/method_details.xlsx;Sheet1;Model_Dict Methods>
+  
+### Method Details
+@<tbl:media/model_dict.__init__.xlsx;Sheet1;Model_Dict.__init__>
+@<tbl:media/model_dict.compile.xlsx;Sheet1;Model_Dict.compile>
+@<tbl:media/model_dict.inference.xlsx;Sheet1;Model_Dict.inference>
+@<tbl:media/model_dict.inference_int8.xlsx;Sheet1;Model_Dict.inference_int8>
+@<tbl:media/model_dict.inference_int8_input_dict.xlsx;Sheet1;Model_Dict.inference_int8_input_dict>
+@<tbl:media/model_dict.to.xlsx;Sheet1;Model_Dict.to>
+ 
+## Function: mxq_compile
+Compile a given model directly without creating an instance of "Model_Dict".
+@<tbl:media/mxq_compile.xlsx;Sheet1;mxq_compile>
+ 
+## Function: make_calib
+Make calibration data and a txt file which contains the generated npy file paths given image and pre-processing configuration yaml file.
+@<tbl:media/make_calib.xlsx;Sheet1;make_calib>
+ 
+## Pre-processing Configurations
+qubee supports the following pre-processing functions to make calibration data
+@<tbl:media/pre_process.xlsx;Sheet1;Pre-processing function API>
+ 
+One can write a yaml file as follows:
+```yaml
+[Pre-processing Type]
+    [Parameter key]: [Parameter value]
+    ...
 ```
-The type should be string or model instance.
 
-Model path or model instance. Model should be instance for the following cases:
-Using backend="onnx" and a onnx model path
-Using backend="tvm" and a Keras model
-Using backend="tvm" and a PyTorch model
-Using backend="tf" and a fronzen TensorFlow PB graph
-
-```python
-backend
+Example)
+```yaml
+GetImage: 
+    to_float32: false
+    channel_order: RGB
+ResizeTorch: 
+    size: [256, 256]
+    interpolation: blinear
+CenterCrop:
+    size: [224, 224]
+Normalize:
+    mean: [0.485, 0.456, 0.406]
+    std: [0.229, 0.224, 0.225]
+    to_float: true
+SetOrder:
+    shape: HWC
 ```
-The type should be string.
 
-Which framework to use to get the Mobilint IR.
-It must be one of "onnx", "tf", and "tvm".
-They correspond to deep learning frameworks as follows:
-"onnx": ONNX
-"tf": TensorFlow
-"tvm": PyTorch, Keras, ONNX
-
-```python
-input_shape
-```
-The type should be tuple or list.
-
-Input shape in HWC. Required only for using PyTorch model and backend="tvm".
-
-```python
-device
-```
-The type should be string.
-
-Device to be used for compile and inerence. Either cpu or gpu.
-
-### compile
-* Parameters
-```python
-model_nickname
-```
-The type should be string.
-
-Model nickname used in qubee. qubee stores previous optimization information to \
-recompile same models faster. qubee finds the previously compiled result with nickname.
-
-```python
-calib_txt_path
-```
-The type should be string.
-
-.txt file contain calibration dataset list, which results from `make_calib`.
-Calibration dataset should be .npy files with np.float32 dtype.
-
-```python
-save_path
-```
-The type should be string.
-
-Filename of the resulting .mxq.
-Using "`Directory path`/`model_nickname`.mxq" is recommended.
-
-```python
-quantize_method
-```
-The type should be string.
-This is optional, and it defaults to percentile.
-
-Quantization method to determine the scale parameter in the quantization.
-Currently, "Max", "Percentile", "MaxPercentile" are supported.
-
-```python
-quantize_percentile
-```
-The type should be float.
-This is optional, and it defaults to 0.9999.
-
-Percentile used for the quantization method "Percentile" and "MaxPercentile".
-This should be between 0 and 1. (Ex. 0.999, 0.9999)
-
-```python
-topk_ratio
-```
-The type should be float.
-It is used for quantization method 'maxpercentile'. Defaults to 0.
-The larger this value is, the more data is used for calibration.
-This should be between 0 and 1, but using a value of 0.01 or less is recommended.
-
-```python
-is_quant_ch
-```
-The type should be bool.
-Use multi-channel quantization if True. Defaults to False.
-If is_quant_ch is set to True, only "Max" and "MaxPercentile" are supported.
-
-
-```python
-optimization
-```
-The type should be bool.
-This is optional, and it defaults to True.
-
-If true, it compiles the model with optimization process. If false, qubee uses \
-previous optimization information when stored in previous compiling. \
-(Nickname should be the same.) It must be set to True on the first compile.
-
-```python
-optimization_level
-```
-The type should be int.
-
-Optimization level in the compiler. If optimization level is high, NPU inference \
-could be faster, but it takes more time for compiling. (Recommend: 3~6)
-
-```python
-save_sample
-```
-The type should be bool.
-
-If true, create the "sampleInOut" folder in the current directory and store the \
-input and output binary files in it.
-
-```python
-use_random_calib
-```
-The type should be bool.
-If true, it compiles the given model with random calibration data.
-This is just used to check if the model is compilable without making a calibration data.
-
-### inference
-* Parameters
-```python
-input_tensor
-```
-The type should be torch.Tensor.
-
-Input tensor with layout BCHW.
-
-### inference_int8
-* Parameters
-```python
-input_tensor
-```
-The type should be torch.Tensor.
-
-Input tensor with layout BCHW.
-
-### to
-* Parameters
-```python
-device
-```
-The type should be string.
-
-Target device to use, which must be one of "cpu", "gpu", "cuda".
+### Pre-processing Parameters
+@<tbl:media/pre_process.GetImage.xlsx;Sheet1;GetImage>
+ 
+@<tbl:media/pre_process.Pad.xlsx;Sheet1;Pad>
+ 
+@<tbl:media/pre_process.Normalize.xlsx;Sheet1;Normalize>
+ 
+@<tbl:media/pre_process.ResizeTorch.xlsx;Sheet1;ResizeTorch>
+ 
+@<tbl:media/pre_process.Resize.xlsx;Sheet1;Resize>
+ 
+@<tbl:media/pre_process.CenterCrop.xlsx;Sheet1;CenterCrop>
+ 
+@<tbl:media/pre_process.SetOrder.xlsx;Sheet1;SetOrder>
+ 
 
 # Open Source License Notice
 @<b>Apache TVM@</b>

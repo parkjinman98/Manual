@@ -8,7 +8,7 @@ property["IP_Name_Header"]			= "Developers Guide"
 property["Ownership"]				= "Mobilint"
 property["Document_Name_Header"]	= "Developers Guide"
 property["Security_Level"]			= "Mobilint Confidential"
-property["Water_Mark"]				= "Provided to LG CNS, 23MAR21"
+property["Water_Mark"]				= "Provided to LG CNS, 23MAR23"
 
 AddRevision("0.2",	2021, 12,  01,	"Revised for v0.2")
 AddRevision("0.3",	2022, 02,  05,	"Revised for v0.3")
