@@ -1,17 +1,11 @@
 # Introduction
- Mobilint® Model Compiler (i.e., Compiler) is a tool that converts models from \
-deep learning frameworks (ONNX, PyTorch, Keras, TensorFlow, etc...) into Mobilint® \
-Model eXeCUtable (i.e., MXQ), a format executable by Mobilint® Neural Processing \
-Unit (NPU). This is the manual for the qubee, Mobilint's SDK. In this manual, \
-you can leran how to use the SDK, what kind of frameworks does it support, etc. \
-A set of functions that can be used to interact with the SDK will be given below.
+ Mobilint® Model Compiler (i.e., Compiler) is a tool that converts models from deep learning frameworks (ONNX, PyTorch, Keras, TensorFlow, etc...) into Mobilint® Model eXeCUtable (i.e., MXQ), a format executable by Mobilint® Neural Processing Unit (NPU). This is the manual for the qubee, Mobilint's SDK. In this manual, you can leran how to use the SDK, what kind of frameworks does it support, etc. A set of functions that can be used to interact with the SDK will be given below.
 
-@<img:#media/sdk_components.png;0.5;SDK Components>
+@<img:media/component.svg;0.5;SDK Components>
 
- Input to the SDK is a trained deep learning model, its input shape, and \
-calibration data. SDK will return MXQ (compiled model) as an output.
+ Input to the SDK is a trained deep learning model, its input shape, and calibration data. SDK will return MXQ (compiled model) as an output.
 
-@<img:#media/input_and_output.png;0.75;Input and output of qubee>
+@<img:media/input_and_output.png;0.75;Input and output of qubee>
 
 # Changelog
 ## qubee v0.7 (March 2023)
@@ -51,27 +45,24 @@ First release
 
 # Installation
 ## System requirements
- In order to use the qubee, the NVIDIA GPU is required. CPU version qubee will \
-be provided in the future.
-
+ We recommend to use NVIDIA GPU for faster compile wtih qubee, but it is nor requirement. Currently, CPU version qubee is also supported.
+ 
 ### Reference System
 ```vim
 Ubuntu 18.04.6 LTS
 NVIDIA Graphics Driver 465.19.01
 ```
  
-
-### Requirement Packages
+### Recommended Packages
 ```vim
 NVIDIA Graphics Driver 450.80.02 or Above
 Docker
 nvidia-docker
 ```
  
-
 ## SDK Installation
- We recommend installing qubee on the mobilint docker container. \
-(Docker image: mobilint/qbcompiler:v0.4, @<link:https://hub.docker.com/r/mobilint/qbcompiler;https://hub.docker.com/r/mobilint/qbcompiler>)
+ We recommend installing qubee on the mobilint docker container. 
+(Docker image: mobilint/qbcompiler:v0.6, @<link:https://hub.docker.com/r/mobilint/qbcompiler;https://hub.docker.com/r/mobilint/qbcompiler>)
 
 ### Building Docker Image
 Run the following commands to build the docker image.
@@ -81,8 +72,7 @@ $ docker pull mobilint/qbcompiler:v0.6
 $ # Make a docker container
 $ docker run -it --gpus all --name mxq_compiler -v $(pwd):/data mobilint/qbcompiler:v0.6
 ```
-
-
+ 
 ### Installation of qubee
  Run the following commands to install qubee on the docker container.
 ```bash
@@ -98,12 +88,10 @@ $ python -m pip install qubee-0.7-py3-none-any.whl
 ```
 
 # Tutorials
- The tutorials below go through preparing calibration dataset, model compile \
-and inference steps.
+ The tutorials below go through preparing calibration dataset, model compile and inference steps.
 
 ## Preparing Calibration Data
- This step makes calibration data txt file for quantization. This step is \
-required before compiling the model.
+ This step makes calibration data txt file for quantization. This step is required before compiling the model.
 
 ```python
 from qubee import make_calib
@@ -138,10 +126,7 @@ SetOrder:
  
 
 ## Compiling ONNX Models
- ONNX model can be parsed in two different ways. The first one just directly \
-parses the ONNX model, converts it to Mobilint IR. The second one converts the \
-ONNX model to TVM, parses it, and converts it to Mobilint IR. Once the model is \
-converted into Mobilint IR, then it will be compiled into MXQ.
+ ONNX model can be parsed in two different ways. The first one just directly parses the ONNX model, converts it to Mobilint IR. The second one converts the ONNX model to TVM, parses it, and converts it to Mobilint IR. Once the model is converted into Mobilint IR, then it will be compiled into MXQ.
 ```python
 """ Compile ONNX model, first way""" 
 onnx_model_path = "/workspace/mount/onnx_models/resnet18.onnx"
@@ -172,10 +157,7 @@ mxq_compile(
  
 
 ## Compiling PyTorch Models
- PyTorch model can be parsed in two different ways. First, one converts to ONNX, \
-parses it, and converts to Mobilint IR. The second one converts to TVM, parses it, \
-and converts to Mobilint IR. Once the model is converted to Mobilint IR, then it \
-will be compiled into MXQ.
+ PyTorch model can be parsed in two different ways. First, one converts to ONNX, parses it, and converts to Mobilint IR. The second one converts to TVM, parses it, and converts to Mobilint IR. Once the model is converted to Mobilint IR, then it will be compiled into MXQ.
 
 ```python
 """ Compile PyTorch model, first way """
@@ -216,8 +198,7 @@ mxq_compile(
  
 
 ## Compiling Keras Models
- Keras model will be to TVM, which will be parsed and converted to Mobilint IR. \
-Once the model is converted to Mobilint IR, then it will be compiled into MXQ.
+ Keras model will be to TVM, which will be parsed and converted to Mobilint IR. Once the model is converted to Mobilint IR, then it will be compiled into MXQ.
 
 ```python
 """ Compile Keras model """ 
@@ -238,9 +219,7 @@ mxq_compile(
  
 
 ## Compiling TensorFlow Models
- qubee supports TensorFlow up to version 1.15. So, it requires a frozen \
-TensorFlow PB graph as input, which will be parsed and converted to Mobilint IR. \
-Once the model is converted to Mobilint IR, then it will be compiled into MXQ.
+ qubee supports TensorFlow up to version 1.15. So, it requires a frozen TensorFlow PB graph as input, which will be parsed and converted to Mobilint IR. Once the model is converted to Mobilint IR, then it will be compiled into MXQ.
 
 ```python
 """ Compile Tensorflow model """
@@ -268,30 +247,32 @@ mxq_compile(
 ```
 # CPU Offloading
 
-From qubee v0.7, we provide Beta version of CPU offloading for mxq compile. CPU offloading makes it easier for users to compile their models by automatically offloading the computation to the CPU, even if the model contains operations that are not supported by Mobilint NPU. For example, if a preprocessing or postprocessing function used in deep learning involves operations that are not supported by the NPU, the user would have to implement them manually, but CPU offloading covers most of these operations and eliminates the need for additional work.
-
-
-
+From qubee v0.7, we provide Beta version of CPU offloading for mxq compile. CPU offloading makes it easier for users to compile their models by automatically offloading the computation to the CPU, even if the model contains operations that are not supported by Mobilint NPU. For example, if a pre-processing or post-processing included in the model involves operations that are not supported by the NPU, the user would have to implement them manually after compile, but CPU offloading covers most of these operations and eliminates the need for additional work.
+ 
+@<img:media/offloading_fig.svg;0.75;SDK CPU Offloading>
+ 
 # Supported Frameworks
- We support almost all the commonly used Machine Learning frameworks & libraries, \
-such as ONNX, TVM, PyTorch, Keras, and TensorFlow.
+ We support almost all the commonly used Machine Learning frameworks & libraries such as ONNX, TVM, PyTorch, Keras, and TensorFlow.
 
 @<img:#media/supported_frameworks.png;1.0;Supported deep-learning frameworks>
 
 ## Supported Operations (ONNX)
 @<tbl:media/supported_onnx.xlsx;Sheet1;ONNX Supported Operations>
+ 
 ## Supported operations (PyTorch)
 @<tbl:media/supported_pytorch.xlsx;Sheet1;PyTorch Supported Operations>
+ 
 ## Supported operations (TensorFlow)
 @<tbl:media/supported_tf.xlsx;Sheet1;TensorFlow Supported Operations>
+ 
 ## Supported operations (Keras)
 @<tbl:media/supported_keras.xlsx;Sheet1;Keras Supported Operation>
-
+ 
 # API Reference
 ## Class: Model_Dict
 This class serves two main functions:
 1. Compile
-2. Inference (Note that this inference is done by CPU or GPU.)
+2. Inference (Note that this inference is only for testing and done by CPU or GPU.)
 
 @<tbl:media/class_model_dict.xlsx;Sheet1;Model_Dict Class>
  
@@ -300,33 +281,39 @@ This class serves two main functions:
   
 ### Method Details
 @<tbl:media/model_dict.__init__.xlsx;Sheet1;Model_Dict.__init__>
+ 
 @<tbl:media/model_dict.compile.xlsx;Sheet1;Model_Dict.compile>
+ 
 @<tbl:media/model_dict.inference.xlsx;Sheet1;Model_Dict.inference>
+ 
 @<tbl:media/model_dict.inference_int8.xlsx;Sheet1;Model_Dict.inference_int8>
+ 
 @<tbl:media/model_dict.inference_int8_input_dict.xlsx;Sheet1;Model_Dict.inference_int8_input_dict>
+ 
 @<tbl:media/model_dict.to.xlsx;Sheet1;Model_Dict.to>
  
+
 ## Function: mxq_compile
 Compile a given model directly without creating an instance of "Model_Dict".
 @<tbl:media/mxq_compile.xlsx;Sheet1;mxq_compile>
  
 ## Function: make_calib
-Make calibration data and a txt file which contains the generated npy file paths given image and pre-processing configuration yaml file.
+From given images and preprocessing configuration, create the preprocessed numpy files and a txt file containing their paths.
 @<tbl:media/make_calib.xlsx;Sheet1;make_calib>
  
 ## Pre-processing Configurations
-qubee supports the following pre-processing functions to make calibration data
+qubee supports the following pre-processing functions to make calibration data.
 @<tbl:media/pre_process.xlsx;Sheet1;Pre-processing function API>
  
 One can write a yaml file as follows:
 ```yaml
 [Pre-processing Type]
-    [Parameter key]: [Parameter value]
+    [Parameter]: [Argument]
     ...
 ```
-
-Example)
+ 
 ```yaml
+# Example
 GetImage: 
     to_float32: false
     channel_order: RGB
@@ -342,7 +329,7 @@ Normalize:
 SetOrder:
     shape: HWC
 ```
-
+ 
 ### Pre-processing Parameters
 @<tbl:media/pre_process.GetImage.xlsx;Sheet1;GetImage>
  
