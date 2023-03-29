@@ -116,8 +116,8 @@ make_calib(args_pre, data_dir, save_dir, save_name, max_size)
 # mobilenet_v3_small.yaml
 
 GetImage:
-to_float32: false
-  channel_order: RGB
+    to_float32: false
+    channel_order: RGB
 ResizeTorch:
     size: [256, 256]
     interpolation: blinear
@@ -314,7 +314,7 @@ input_shape
 ```
 The type should be tuple or list.
 
-Input shape in HWC. Necessary only for using PyTorch model and backend="tvm".
+Input shape in HWC. Required only for using PyTorch model and backend="tvm".
 
 ```python
 device
@@ -338,7 +338,7 @@ calib_txt_path
 ```
 The type should be string.
 
-.txt file contain calibration dataset list.
+.txt file contain calibration dataset list, which results from `make_calib`.
 Calibration dataset should be .npy files with np.float32 dtype.
 
 ```python
@@ -347,7 +347,7 @@ save_path
 The type should be string.
 
 Filename of the resulting .mxq.
-recommend "model_nickname.mxq"
+Using "`Directory path`/`model_nickname`.mxq" is recommended.
 
 ```python
 quantize_method
@@ -356,7 +356,7 @@ The type should be string.
 This is optional, and it defaults to percentile.
 
 Quantization method to determine the scale parameter in the quantization.
-Now support "Max" or "Percentile"
+Currently, "Max", "Percentile", "MaxPercentile" are supported.
 
 ```python
 quantize_percentile
@@ -364,14 +364,30 @@ quantize_percentile
 The type should be float.
 This is optional, and it defaults to 0.9999.
 
-Percentile used for the quantization method "percentile".
-Percentile should be between 0 and 1. (Ex. 0.999, 0.9999)
+Percentile used for the quantization method "Percentile" and "MaxPercentile".
+This should be between 0 and 1. (Ex. 0.999, 0.9999)
+
+```python
+topk_ratio
+```
+The type should be float.
+It is used for quantization method 'maxpercentile'. Defaults to 0.
+The larger this value is, the more data is used for calibration.
+This should be between 0 and 1, but using a value of 0.01 or less is recommended.
+
+```python
+is_quant_ch
+```
+The type should be bool.
+Use multi-channel quantization if True. Defaults to False.
+If is_quant_ch is set to True, only "Max" and "MaxPercentile" are supported.
+
 
 ```python
 optimization
 ```
 The type should be bool.
-This is optional, and it defaults to 5.
+This is optional, and it defaults to True.
 
 If true, it compiles the model with optimization process. If false, qubee uses \
 previous optimization information when stored in previous compiling. \
@@ -392,6 +408,13 @@ The type should be bool.
 
 If true, create the "sampleInOut" folder in the current directory and store the \
 input and output binary files in it.
+
+```python
+use_random_calib
+```
+The type should be bool.
+If true, it compiles the given model with random calibration data.
+This is just used to check if the model is compilable without making a calibration data.
 
 ### inference
 * Parameters
