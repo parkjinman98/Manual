@@ -5,7 +5,7 @@
 
  Input to the SDK is a trained deep learning model, its input shape, and calibration data. SDK will return MXQ (compiled model) as an output.
 
-@<img:media/input_and_output.png;0.75;Input and output of qubee>
+@<img:media/qubee.svg;0.75;Input and output of qubee>
 
 # Changelog
 ## qubee v0.7 (March 2023)
@@ -249,7 +249,7 @@ mxq_compile(
 
 From qubee v0.7, we provide Beta version of CPU offloading for mxq compile. CPU offloading makes it easier for users to compile their models by automatically offloading the computation to the CPU, even if the model contains operations that are not supported by Mobilint NPU. For example, if a pre-processing or post-processing included in the model involves operations that are not supported by the NPU, the user would have to implement them manually after compile, but CPU offloading covers most of these operations and eliminates the need for additional work.
  
-@<img:media/offloading_fig.svg;0.75;SDK CPU Offloading>
+@<img:media/offloading_fig.svg;0.85;SDK CPU Offloading>
  
 # Supported Frameworks
  We support almost all the commonly used Machine Learning frameworks & libraries such as ONNX, TVM, PyTorch, Keras, and TensorFlow.
