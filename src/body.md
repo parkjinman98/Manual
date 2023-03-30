@@ -1,5 +1,5 @@
 # Introduction
- Mobilint® Model Compiler (i.e., Compiler) is a tool that converts models from deep learning frameworks (ONNX, PyTorch, Keras, TensorFlow, etc...) into Mobilint® Model executable (i.e., MXQ), a format executable by Mobilint® Neural Processing Unit (NPU). This is the manual for the qubee, Mobilint's SDK. In this manual, you can leran how to use the SDK, what kind of frameworks does it support, etc. A set of functions that can be used to interact with the SDK will be given below.
+ Mobilint® Model Compiler (i.e., Compiler) is a tool that converts models from deep learning frameworks (ONNX, PyTorch, Keras, TensorFlow, etc...) into Mobilint® Model eXeCUtable (i.e., MXQ), a format executable by Mobilint® Neural Processing Unit (NPU). This is the manual for the qubee, Mobilint's SDK. In this manual, you can leran how to use the SDK, what kind of frameworks does it support, etc. A set of functions that can be used to interact with the SDK will be given below.
 
 @<img:media/component.svg;0.5;SDK Components>
 
