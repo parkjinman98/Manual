@@ -5,7 +5,7 @@
 
  Input to the SDK is a trained deep learning model, its input shape, and calibration data. SDK will return MXQ (compiled model) as an output.
 
-@<img:media/qubee.svg;0.75;Input and output of qubee>
+@<img:media/qubee.jpg;0.75;Input and output of qubee>
 
 # Changelog
 ## qubee v0.7 (March 2023)
@@ -266,7 +266,7 @@ From qubee v0.7, we provide Beta version of CPU offloading for mxq compile. CPU 
 @<tbl:media/supported_tf.xlsx;Sheet1;TensorFlow Supported Operations>
  
 ## Supported operations (Keras)
-@<tbl:media/supported_keras.xlsx;Sheet1;Keras Supported Operation>
+@<tbl:media/supported_keras.xlsx;Sheet1;Keras Supported Operations>
  
 # API Reference
 ## Class: Model_Dict
