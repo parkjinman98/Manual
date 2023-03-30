@@ -5,7 +5,7 @@
 
  Input to the SDK is a trained deep learning model, its input shape, and calibration data. SDK will return MXQ (compiled model) as an output.
 
-@<img:media/qubee.svg;0.75;Input and output of qubee>
+@<img:media/qubee.jpg;0.75;Input and output of qubee>
 
 # Changelog
 ## qubee v0.7 (March 2023)
