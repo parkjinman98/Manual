@@ -303,7 +303,7 @@ From given images and preprocessing configuration, create the preprocessed numpy
  
 ## Fuction: make_calib_man
 From given images and manually written function that takes a image path as input, create the preprocessed numpy files and a txt file containing their paths.
-@<tbl:media/make_calib.xlsx;Sheet1;make_calib_man>
+@<tbl:media/make_calib_man.xlsx;Sheet1;make_calib_man>
 
 For example, one can uses this as follows:
  
@@ -311,7 +311,7 @@ For example, one can uses this as follows:
 ```python
 import cv2
 import numpy as np
-from qubee import make_calib, make_calib_man
+from qubee import make_calib_man
 
 def pre_ftn(img_path: str):
     x = cv2.imread(img_path, cv2.IMREAD_COLOR)
