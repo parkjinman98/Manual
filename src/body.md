@@ -301,6 +301,32 @@ Compile a given model directly without creating an instance of "Model_Dict".
 From given images and preprocessing configuration, create the preprocessed numpy files and a txt file containing their paths.
 @<tbl:media/make_calib.xlsx;Sheet1;make_calib>
  
+## Fuction: make_calib_man
+From given images and manually written function that takes a image path as input, create the preprocessed numpy files and a txt file containing their paths.
+@<tbl:media/make_calib.xlsx;Sheet1;make_calib_man>
+
+For example, one can uses this as follows:
+ 
+
+```python
+import cv2
+import numpy as np
+from qubee import make_calib, make_calib_man
+
+def pre_ftn(img_path: str):
+    x = cv2.imread(img_path, cv2.IMREAD_COLOR)
+    x = x.astype(np.float32) / 255.
+    x -= 0.01
+    x *= 1.3
+    return x
+
+make_calib_man(
+    pre_ftn=pre_ftn,
+    save_dir="calibration",
+    data_dir="/workspace/datasets/color_samples",
+    save_name="color_test")
+```
+
 ## Pre-processing Configurations
 qubee supports the following pre-processing functions to make calibration data.
 @<tbl:media/pre_process.xlsx;Sheet1;Pre-processing function API>
