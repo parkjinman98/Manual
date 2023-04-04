@@ -302,7 +302,7 @@ From given images and preprocessing configuration, create the preprocessed numpy
 @<tbl:media/make_calib.xlsx;Sheet1;make_calib>
  
 ## Fuction: make_calib_man
-From given images and manually written function that takes a image path as input, create the preprocessed numpy files and a txt file containing their paths.
+From given images and manually written function that takes an image path as input, create the preprocessed numpy files and a txt file containing their paths.
 @<tbl:media/make_calib_man.xlsx;Sheet1;make_calib_man>
 
 For example, one can uses this as follows:
