@@ -8,10 +8,20 @@
 @<img:media/qubee.jpg;0.75;Input and output of qubee>
 
 # Changelog
+## qubee v0.7.3 (June 2023)
+API
+    CPU offloading (beta version)
+Support more operations
+Docker
+    torch: 1.10.1 -> 1.13.0
+    tensorflow: 2.3.0 -> 2.9.0
+    onnx:1.11.0 -> 1.12.0
+
 ## qubee v0.7 (March 2023)
 Multi-channel quantization
 Support more operations
-API to make calibration dataset
+API
+    Calibration dataset
 CPU Offloading (Beta Version)
 
 ## qubee v0.6 (August 2022)
@@ -62,111 +72,226 @@ nvidia-docker
  
 ## SDK Installation
  We recommend installing qubee on the mobilint docker container. 
-(Docker image: mobilint/qbcompiler:v0.6, @<link:https://hub.docker.com/r/mobilint/qbcompiler;https://hub.docker.com/r/mobilint/qbcompiler>)
+(Docker image: mobilint/qbcompiler:v0.7, @<link:https://hub.docker.com/r/mobilint/qbcompiler>)
 
 ### Building Docker Image
 Run the following commands to build the docker image.
 ```bash
 $ # Docker image download
-$ docker pull mobilint/qbcompiler:v0.6
+$ docker pull mobilint/qbcompiler:v0.7
 $ # Make a docker container
+$ cd {WORKING DIRCTORY}
 $ docker run -it --gpus all --name mxq_compiler -v $(pwd):/data mobilint/qbcompiler:v0.6
 ```
  
 ### Installation of qubee
  Run the following commands to install qubee on the docker container.
 ```bash
-$ # Download qubee-0.7-py3-none-any.whl file
-$ # Copy qubee-0.7-py3-none-any.whl file to Docker
-$ docker cp /path/to/qubee-0.7-py3-none-any.whl mxq_compiler:/
+$ # Download qubee-0.7.3-py3-none-any.whl file
+$ # Copy qubee whl file to Docker
+$ docker cp {Path to qubee-0.7.3-py3-none-any.whl} mxq_compiler:/
 $ # Start docker
 $ docker start mxq_compiler
 $ # Attach docker
+$ docker exec -it mxq_compiler /bin/bash
 $ # Install qubee
 $ cd /
-$ python -m pip install qubee-0.7-py3-none-any.whl
+$ python -m pip install qubee-0.7.3-py3-none-any.whl
 ```
 
 # Tutorials
- The tutorials below go through preparing calibration dataset, model compile and inference steps.
+ The tutorials below go through preparing the calibration dataset, model compile and inference steps.
 
 ## Preparing Calibration Data
- This step makes calibration data txt file for quantization. This step is required before compiling the model.
+ 
+To compile the model, you should prepare the calibration dataset (the pre-processed inputs for the model) for quantization.
+There are three ways to make calibration dataset as follows:
+
+(i) Pre-process the raw calibration dataset and save it as numpy tensors.
+(ii) Utilize a pre-processing configuration YAML file (only for images).
+(iii) Use a manually defined pre-processing function (only for images).
+  
+@<b> Important @</b> The process of making a calibration dataset may vary depending on whether you compile the model for CPU offloading or not.
+By default, Qubee compiles the model without CPU offloading.
+In this scenario, the pre-processed input shape should be in the format (H, W, C).
+On the other hand, when CPU offloading is employed, the pre-processed input shape should match the input shape that the original model takes.
+
+### Pre-process raw calibration dataset and store them as numpy tensors
+ 
+You can save the pre-processed calibration dataset as numpy tensors and use them to compile the model.
+An example code is shown below.
+The following code assumes that images to be used for calibration is prepared in directory `/workspace/sample/calibration/imagenet`.
+ 
+```python
+import os
+import numpy as np
+import cv2
+
+def get_img_paths_from_dir(dir_path: str, img_ext = ["jpg", "jpeg", "png"]):
+    assert os.path.exists(dir_path)
+    candidates = os.listdir(dir_path)
+    return [os.path.join(dir_path, y) for y in candidates if any([y.lower().endswith(e) for e in img_ext])]
+
+def pre_process(img_path: str, target_h: int, target_w: int):
+    img = cv2.imread(img_path, cv2.IMREAD_COLOR)
+    resized_img = cv2.resize(img, dsize=(target_w, target_h)).astype(np.float32)
+    return resized_img
+
+if __name__ == "__main__":
+    img_dir = "/workspace/sample/calibration/imagenet"
+    save_dir = "/workspace/sample/calibration/custom_single_input"
+    target_h, target_w = 32, 32
+
+    os.makedirs(save_dir, exist_ok=True)
+    img_paths = get_img_paths_from_dir(img_dir)
+    for i, img_path in enumerate(img_paths):
+        fname = f"{i}".zfill(3) + ".npy"
+        fpath = os.path.join(save_dir, fname)
+        x = pre_process(img_path, target_h, target_w)
+        np.save(fpath, x)
+```
+ 
+### Use a pre-processing configuration YAML file
+ 
+Image pre-processing techniques such as resizing, cropping, and normalization are often applied in machine vision tasks.
+Users can construct a pre-processing configuration by making use of a YAML file and prepare the calibration dataset via the API provided by qubee, @<i>make_calib@</i>.
+Please be aware that this method can only be employed when the raw data is in the form of an image.
+An example code is shown below.
+The following code assumes that images to be used for calibration is prepared in directory `/workspace/sample/calibration/imagenet`.
 
 ```python
 from qubee import make_calib
-args_pre = 'mobilenet_v3_small.yaml' # path to pre-processing configuration yaml file
-data_dir = '/mount/datasets/imagenet/mlperf_subset' # path to folder of original calibration data files such as images
-save_dir = '/workspace/calibration' # path to folder to save pre-proceessed calibration data files
-save_name = 'calib_imagenet_mobilenet_v3' # tag for the generated calibration dataset
-max_size = 500 # Maximum number of data to use for calibration
-make_calib(args_pre, data_dir, save_dir, save_name, max_size)
+make_calib(
+    args_pre="mobilenet_v2.yaml", # path to pre-processing configuration yaml file
+    data_dir="/workspace/sample/calibration/imagenet", # path to folder of original calibration data files such as images
+    save_dir="/workspace/sample/calibration", # path to folder to save pre-proceessed calibration data files
+    save_name="mobilenet_v2", # tag for the generated calibration dataset
+    max_size=50 # Maximum number of data to use for calibration
+)
 ```
 
 ```yaml
-# mobilenet_v3_small.yaml
-
+# mobilenet_v2.yaml
+Datatype: Image
 GetImage:
     to_float32: false
     channel_order: RGB
-ResizeTorch:
-    size: [256, 256]
-    interpolation: blinear
-CenterCrop:
-    size: [224, 224]
-Normalize:
-    mean: [0.485, 0.456, 0.406]
-    std: [0.229, 0.224, 0.225]
-    to_float: true
-SetOrder:
-    shape: HWC
+
+Pre-Order: [ResizeTorch, CenterCrop, Normalize, SetOrder]
+Pre-processing:
+    ResizeTorch:
+        size: [256, 256]
+        interpolation: bilinear
+    CenterCrop:
+        size: [224, 224]
+    Normalize:
+        mean: [0.485, 0.456, 0.406]
+        std: [0.229, 0.224, 0.225]
+        to_float_div255: true
+    SetOrder:
+        shape: HWC
 ```
-
- The above results calibration meta txt file “/workspace/calibration/calib_imagenet_mobilenet_v3.txt”.
  
+The above results in a directory containing the pre-processed calibration dataset, located at "/workspace/sample/calibration/mobilenet_v2".
+Additionally, a calibration meta txt file containing the paths to the pre-processed numpy files is created, named "/workspace/sample/calibration/mobilenet_v2.txt".
+ 
+### Use a manually defined pre-processing function
+ 
+You can use a manually defined pre-processing function to make the calibration dataset via the API provided by qubee, @<i>make_calib_man@</i>.
+In this case, the pre-processing function should take the image path as input and return a numpy tensor.
+An example of the code is shown below.
+The following code assumes that images to be used for calibration is prepared in directory `/workspace/sample/calibration/imagenet`.
+ 
+```python
+import torch
+import numpy as np
+from PIL import Image
+import torchvision.transforms.functional as F
+from qubee import make_calib_man
 
+def preprocess_resnet50(img_path: str):
+    img = Image.open(img_path)
+    resize_size=(232, 232)
+    crop_size=(224, 224)
+    mean=[0.485, 0.456, 0.406]
+    std=[0.229, 0.224, 0.225]
+    out = F.pil_to_tensor(img)
+    out = F.resize(out, size=resize_size)
+    out = F.center_crop(out, output_size=crop_size)
+    out = out.to(torch.float, copy=False) / 255.
+    out = F.normalize(out, mean, std)
+    out = np.transpose(out.numpy(), axes=[1, 2, 0])
+    return out
+
+make_calib_man(
+    pre_ftn=preprocess_resnet50,
+    data_dir="/workspace/sample/calibration/imagenet",
+    save_dir="/workspace/sample/calibration",
+    save_name="resnet50",
+    max_size=50
+)
+```
+ 
+The above results in a directory containing the pre-processed calibration dataset, located at "/workspace/sample/calibration/resnet50".
+Additionally, a calibration meta txt file containing the paths to the pre-processed numpy files is created, named "/workspace/sample/calibration/resnet50.txt".
+ 
 ## Compiling ONNX Models
- ONNX model can be parsed in two different ways. The first one just directly parses the ONNX model, converts it to Mobilint IR. The second one converts the ONNX model to TVM, parses it, and converts it to Mobilint IR. Once the model is converted into Mobilint IR, then it will be compiled into MXQ.
+ 
+ONNX model can be compiled in two different ways.
+The first approach involves directly parsing the ONNX model to obtain Mobilint IR. 
+The second approach involves converting the ONNX model to TVM, which is then further converted into Mobilint IR. 
+Once the model is converted to Mobilint IR, then it is be compiled into MXQ.
+ 
+Examples of the code are shown below.
+The following codes assume that the calibration dataset and the model are prepared in directory `/workspace/calibration/calib_imagenet_resnet18` and `/workspace/mount/onnx_models/resnet18.onnx`, respectively.
+ 
 ```python
 """ Compile ONNX model, first way""" 
 onnx_model_path = "/workspace/mount/onnx_models/resnet18.onnx"
-calib_txt_path = "/workspace/calibration/calib_imagenet_resnet18.txt"
+calib_data_path = "/workspace/calibration/calib_imagenet_resnet18"
+# calib_data_path can be replaced with the path to the calibration meta file such as "/workspace/calibration/calib_imagenet_resnet18.txt"
 
 mxq_compile(
     model=onnx_model_path,
     model_nickname="resnet18",
-    calib_txt_path=calib_txt_path,
+    calib_data_path=calib_data_path,
     backend="onnx"
 )
 ```
-
+ 
 ```python
 """ Compile ONNX model, second way """ 
 from qubee import mxq_compile
 
 onnx_model_path = "/workspace/mount/onnx_models/resnet18.onnx"
-calib_txt_path = "/workspace/calibration/calib_imagenet_resnet18.txt"
+calib_data_path = "/workspace/calibration/calib_imagenet_resnet18"
+# A calibration meta file such as "/workspace/calibration/calib_imagenet_resnet18.txt" can be used instead.
 
 mxq_compile(
     model=onnx_model_path,
     model_nickname="resnet18",
-    calib_txt_path=calib_txt_path,
+    calib_data_path=calib_data_path,
     backend="tvm"
 )
 ```
  
-
 ## Compiling PyTorch Models
- PyTorch model can be parsed in two different ways. First, one converts to ONNX, parses it, and converts to Mobilint IR. The second one converts to TVM, parses it, and converts to Mobilint IR. Once the model is converted to Mobilint IR, then it will be compiled into MXQ.
-
+PyTorch models can be compiled in two different ways.
+The first approach involves converting the PyTorch model to ONNX, which is then further converted into Mobilint IR. 
+The second approach involves converting the PyTorch model to TVM, which is then further converted into Mobilint IR. 
+Once the model is converted to Mobilint IR, then it is be compiled into MXQ.
+ 
+Examples of the code are shown below.
+The following codes assume that the calibration dataset is prepared in directory `/workspace/calibration/calib_imagenet_resnet18`.
+ 
 ```python
 """ Compile PyTorch model, first way """
 from qubee.utils import convert_pytorch_to_onnx 
 import torchvision 
 
-
 input_shape = (224, 224, 3) 
-calib_txt_path = "/workspace/calibration/calib_imagenet_resnet18.txt"
+calib_data_path = "/workspace/calibration/calib_imagenet_resnet18"
+# A calibration meta file such as "/workspace/calibration/calib_imagenet_resnet18.txt" can be used instead.
 
 ### get resnet18 from torchvision and convert it to ONNX 
 torch_model = torchvision.models.resnet18(pretrained=True) 
@@ -176,7 +301,7 @@ convert_pytorch_to_onnx(torch_model, input_shape, onnx_model_path)
 mxq_compile(
     model=onnx_model_path,
     model_nickname="resnet18",
-    calib_txt_path=calib_txt_path,
+    calib_data_path=calib_data_path,
     backend="onnx"
 )
 ```
@@ -185,44 +310,50 @@ mxq_compile(
 ### get resnet18 from torchvision 
 import torchvision
 torch_model = torchvision.models.resnet18(pretrained=True) 
-calib_txt_path = "/workspace/calibration/calib_imagenet_resnet18.txt"
+calib_data_path = "/workspace/calibration/calib_imagenet_resnet18"
+# A calibration meta file such as "/workspace/calibration/calib_imagenet_resnet18.txt" can be used instead.
 
 mxq_compile(
     model=torch_model,
     model_nickname="resnet18",
-    calib_txt_path=calib_txt_path,
+    calib_data_path=calib_data_path,
     backend="tvm",
     input_shape=(224, 224, 3)
 )
 ```
  
-
 ## Compiling Keras Models
- Keras model will be to TVM, which will be parsed and converted to Mobilint IR. Once the model is converted to Mobilint IR, then it will be compiled into MXQ.
-
+Keras models are converted to TVM, and further converted into Mobilint IR.
+Once the model is converted to Mobilint IR, then it is be compiled into MXQ.
+An example of the code is shown below.
+The following code assumes that the calibration dataset is prepared in directory `/workspace/calibration/calib_imagenet_resnet18`.
+ 
 ```python
 """ Compile Keras model """ 
 import tensorflow.keras as keras 
 
 keras_model = keras.applications.resnet18.ResNet18() 
 input_shape = (224, 224, 3) 
-calib_txt_path = "/workspace/calibration/calib_imagenet_resnet18.txt"
+calib_data_path = "/workspace/calibration/calib_imagenet_resnet18"
+# A calibration meta file such as "/workspace/calibration/calib_imagenet_resnet18.txt" can be used instead.
 
 mxq_compile(
     model=keras_model,
     model_nickname="resnet18",
-    calib_txt_path=calib_txt_path,
+    calib_data_path=calib_data_path,
     backend="tvm",
     input_shape=(224, 224, 3)
 )
 ```
  
-
 ## Compiling TensorFlow Models
- qubee supports TensorFlow up to version 1.15. So, it requires a frozen TensorFlow PB graph as input, which will be parsed and converted to Mobilint IR. Once the model is converted to Mobilint IR, then it will be compiled into MXQ.
-
+qubee supports TensorFlow up to version 1.15.
+So, it requires a frozen TensorFlow PB graph as input, which will be parsed and converted to Mobilint IR.
+Once the model is converted to Mobilint IR, then it is be compiled into MXQ.
+An example of the code is shown below.
+The following code assumes that the calibration dataset is prepared in directory `/workspace/calibration/calib_imagenet_resnet18`.
+ 
 ```python
-""" Compile Tensorflow model """
 """ Compile Tensorflow model """ 
 import wget
 import os
@@ -236,18 +367,27 @@ else:
 tf_model = wget.download('https://zenodo.org/record/2535873/files/resnet50_v1.pb') 
 
 input_shape = (224, 224, 3) 
-calib_txt_path = "/workspace/calibration/calib_imagenet_resnet50.txt"
+calib_data_path = "/workspace/calibration/calib_imagenet_resnet50"
+# A calibration meta file such as "/workspace/calibration/calib_imagenet_resnet18.txt" can be used instead.
 mxq_compile(
     model=tf_model,
     model_nickname="resnet50",
-    calib_txt_path=calib_txt_path,
+    calib_data_path=calib_data_path,
     backend="tf",
     input_shape=(224, 224, 3)
 )
 ```
+ 
 # CPU Offloading
-
-From qubee v0.7, we provide Beta version of CPU offloading for mxq compile. CPU offloading makes it easier for users to compile their models by automatically offloading the computation to the CPU, even if the model contains operations that are not supported by Mobilint NPU. For example, if a pre-processing or post-processing included in the model involves operations that are not supported by the NPU, the user would have to implement them manually after compile, but CPU offloading covers most of these operations and eliminates the need for additional work.
+ 
+From qubee v0.7, we provide Beta version of CPU offloading for mxq compile.
+CPU offloading makes it easier for users to compile their models by automatically offloading the computation to the CPU, even if the model contains operations that are not supported by Mobilint NPU.
+For example, if a pre-processing or post-processing included in the model involves operations that are not supported by the NPU, the user would have to implement them manually after compile, but CPU offloading covers most of these operations and eliminates the need for additional work.
+When using CPU offloading, the procedures for preparing the calibration dataset and compiling the model vary slightly as follows:
+ 
+(i) The pre-processed input shape should match the input shape that the original model takes, whereas the pre-processed input shape should be in the format (H, W, C) to compile the model without CPU offloading.
+ 
+(ii) Set the argument @<i>cpu_offload@</i> of function @<i>mxq_compile@</i> True to enable CPU offloading.
  
 @<img:media/offloading_fig.svg;0.85;SDK CPU Offloading>
  
@@ -305,7 +445,7 @@ From given images and preprocessing configuration, create the preprocessed numpy
 From given images and manually written function that takes an image path as input, create the preprocessed numpy files and a txt file containing their paths.
 @<tbl:media/make_calib_man.xlsx;Sheet1;make_calib_man>
  
-For example, one can use this as follows:
+For example, you can use this as follows:
  
 
 ```python
@@ -331,7 +471,7 @@ make_calib_man(
 qubee supports the following pre-processing functions to make calibration data.
 @<tbl:media/pre_process.xlsx;Sheet1;Pre-processing function API>
  
-One can write a yaml file as follows:
+You can write a yaml file as follows:
 ```yaml
 [Pre-processing Type]
     [Parameter]: [Argument]
