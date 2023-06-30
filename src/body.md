@@ -8,9 +8,10 @@ Inputs to qubee are a trained deep learning model, its input shape, and calibrat
 @<img:media/qubee.jpg;0.75;Input and output of qubee>
 
 # Changelog
-## qubee v0.7.3 (June 2023)
+## qubee v0.7.7 (June 2023)
 API
     CPU offloading (beta version)
+Improve CPU efficiency
 Support more operations
 Docker
     torch: 1.10.1 -> 1.13.0
@@ -87,16 +88,16 @@ $ docker run -it --gpus all --name mxq_compiler -v $(pwd):/data mobilint/qbcompi
 ### Installation of qubee
 Run the following commands to install qubee on the docker container.
 ```bash
-$ # Download qubee-0.7.3-py3-none-any.whl file
+$ # Download qubee-0.7.7-py3-none-any.whl file
 $ # Copy qubee whl file to Docker
-$ docker cp {Path to qubee-0.7.3-py3-none-any.whl} mxq_compiler:/
+$ docker cp {Path to qubee-0.7.7-py3-none-any.whl} mxq_compiler:/
 $ # Start docker
 $ docker start mxq_compiler
 $ # Attach docker
 $ docker exec -it mxq_compiler /bin/bash
 $ # Install qubee
 $ cd /
-$ python -m pip install qubee-0.7.3-py3-none-any.whl
+$ python -m pip install qubee-0.7.7-py3-none-any.whl
 ```
 
 # Tutorials
