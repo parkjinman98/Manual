@@ -224,6 +224,7 @@ ONNX model can be compiled in two different ways. The first approach involves di
 
 ```python
 """ Compile ONNX model, first way""" 
+from qubee import mxq_compile
 onnx_model_path = "/workspace/resnet18.onnx"
 calib_data_path = "/workspace/cali_imagenet"
 # calib_data_path can be replaced with the path to the calibration meta file such as "/workspace/cali_imagenet.txt"
@@ -239,7 +240,6 @@ mxq_compile(
 ```python
 """ Compile ONNX model, second way """ 
 from qubee import mxq_compile
-
 onnx_model_path = "/workspace/resnet18.onnx"
 calib_data_path = "/workspace/cali_imagenet"
 # A calibration meta file such as "/workspace/cali_imagenet.txt" can be used instead.
@@ -257,6 +257,7 @@ PyTorch models can be compiled in two different ways. The first approach involve
 
 ```python
 """ Compile PyTorch model, first way """
+from qubee import mxq_compile
 from qubee.utils import convert_pytorch_to_onnx 
 import torchvision 
 
@@ -278,6 +279,7 @@ mxq_compile(
 ```
 
 ```python
+from qubee import mxq_compile
 ### get resnet18 from torchvision 
 import torchvision
 torch_model = torchvision.models.resnet18(pretrained=True) 
@@ -298,6 +300,7 @@ Keras models are converted to TVM, and further converted into Mobilint IR. Once 
 
 ```python
 """ Compile Keras model """ 
+from qubee import mxq_compile
 import tensorflow.keras as keras 
 
 keras_model = keras.applications.resnet18.ResNet18() 
@@ -319,6 +322,7 @@ qubee supports TensorFlow up to version 1.15. So, it requires a frozen TensorFlo
  
 ```python
 """ Compile Tensorflow model """ 
+from qubee import mxq_compile
 import wget
 import os
 
