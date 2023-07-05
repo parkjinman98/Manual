@@ -401,6 +401,10 @@ This class serves two main functions:
 Compile a given model directly without creating an instance of "Model_Dict".
 @<tbl:media/mxq_compile.xlsx;Sheet1;mxq_compile>
  
+### Tips for choosing quantization methods
+"Percentile" and "MaxPercentile" quantization methods each take a hyperparameter called @<i>percentile@</i>. An increase in this value corresponds to a wider quantization interval. To elaborate further, a higher @<i>percentile@</i> results in reduced overflow, albeit at the expense of accuracy.
+"MaxPercentile" method determines the percentile value from data that has been filtered once. As a result, a lower @<i>percentile@</i> is needed for "MaxPercentile" compared to the "Percentile" method. For instance, for "Percentile" method, we suggest using a value in the range of 0.9999 to 0.999999. For "MaxPercentile" method, we recommend @<i>percentile@</i> between 0.9 and 0.9999.
+
 ## Function: make_calib
 From given images and preprocessing configuration, create the preprocessed numpy files and a txt file containing their paths.
 @<tbl:media/make_calib.xlsx;Sheet1;make_calib>
