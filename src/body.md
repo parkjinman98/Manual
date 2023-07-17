@@ -231,7 +231,6 @@ calib_data_path = "/workspace/cali_imagenet"
 
 mxq_compile(
     model=onnx_model_path,
-    model_nickname="resnet18",
     calib_data_path=calib_data_path,
     backend="onnx"
 )
@@ -246,7 +245,6 @@ calib_data_path = "/workspace/cali_imagenet"
 
 mxq_compile(
     model=onnx_model_path,
-    model_nickname="resnet18",
     calib_data_path=calib_data_path,
     backend="tvm"
 )
@@ -272,7 +270,6 @@ convert_pytorch_to_onnx(torch_model, input_shape, onnx_model_path)
 
 mxq_compile(
     model=onnx_model_path,
-    model_nickname="resnet18",
     calib_data_path=calib_data_path,
     backend="onnx"
 )
@@ -288,7 +285,6 @@ calib_data_path = "/workspace/cali_imagenet"
 
 mxq_compile(
     model=torch_model,
-    model_nickname="resnet18",
     calib_data_path=calib_data_path,
     backend="tvm",
     input_shape=(224, 224, 3)
@@ -310,7 +306,6 @@ calib_data_path = "/workspace/cali_imagenet"
 
 mxq_compile(
     model=keras_model,
-    model_nickname="resnet18",
     calib_data_path=calib_data_path,
     backend="tvm",
     input_shape=(224, 224, 3)
@@ -339,7 +334,6 @@ calib_data_path = "/workspace/cali_imagenet"
 # A calibration meta file such as "/workspace/cali_imagenet.txt" can be used instead.
 mxq_compile(
     model=tf_model,
-    model_nickname="resnet50",
     calib_data_path=calib_data_path,
     backend="tf",
     input_shape=(224, 224, 3)
