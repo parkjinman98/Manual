@@ -232,6 +232,7 @@ calib_data_path = "/workspace/cali_imagenet"
 mxq_compile(
     model=onnx_model_path,
     calib_data_path=calib_data_path,
+    save_path="resnet18.mxq",
     backend="onnx"
 )
 ```
@@ -246,6 +247,7 @@ calib_data_path = "/workspace/cali_imagenet"
 mxq_compile(
     model=onnx_model_path,
     calib_data_path=calib_data_path,
+    save_path="resnet18.mxq",
     backend="tvm"
 )
 ```
@@ -271,6 +273,7 @@ convert_pytorch_to_onnx(torch_model, input_shape, onnx_model_path)
 mxq_compile(
     model=onnx_model_path,
     calib_data_path=calib_data_path,
+    save_path="resnet18.mxq",
     backend="onnx"
 )
 ```
@@ -287,6 +290,7 @@ mxq_compile(
     model=torch_model,
     calib_data_path=calib_data_path,
     backend="tvm",
+    save_path="resnet18.mxq",
     input_shape=(224, 224, 3)
 )
 ```
@@ -308,6 +312,7 @@ mxq_compile(
     model=keras_model,
     calib_data_path=calib_data_path,
     backend="tvm",
+    save_path="resnet18.mxq",
     input_shape=(224, 224, 3)
 )
 ```
@@ -336,6 +341,7 @@ mxq_compile(
     model=tf_model,
     calib_data_path=calib_data_path,
     backend="tf",
+    save_path="resnet50.mxq",
     input_shape=(224, 224, 3)
 )
 ```
