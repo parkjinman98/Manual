@@ -1,6 +1,6 @@
 -- 문서 속성들
 property["Document_Name"]			= "Model Compiler Suite for Aries™"
-property["IP_Version"]				= "v0.7.7"
+property["IP_Version"]				= "v0.7.11"
 property["Comprehensive_IP_Title"]	= "Model Compiler Suite for Aries"
 property["IP_Name_First_Page"]		= "Developers Guide"
 property["Business_Unit"]			= "Software"
@@ -17,5 +17,6 @@ AddRevision("0.5",	2022, 07,  01,	"Revised for v0.5")
 AddRevision("0.6",	2022, 08,  10,	"Revised for v0.6")
 AddRevision("0.7",  2023, 03,  23,  "Revised for v0.7")
 AddRevision("0.7.7",  2023, 06,  30,  "Revised for v0.7.7")
+AddRevision("0.7.11",  2023, 09,  08,  "Revised for v0.7.11")
 
 AddParagraph("[[src/body.md]]")

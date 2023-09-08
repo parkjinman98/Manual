@@ -8,6 +8,11 @@ Inputs to qubee are a trained deep learning model, its input shape, and calibrat
 @<img:media/qubee.jpg;0.75;Input and output of qubee>
 
 # Changelog
+## qubee v0.7.12 (Sep 2023)
+API
+    Torchscript Backend
+
+
 ## qubee v0.7.7 (June 2023)
 API
     CPU offloading (beta version)
@@ -85,19 +90,28 @@ $ cd {WORKING DIRCTORY}
 $ docker run -it --gpus all --name mxq_compiler -v $(pwd):/data mobilint/qbcompiler:v0.7
 ```
  
+(Option) Build the docker image for WSL2
+```bash
+$ # Docker image download
+$ docker pull mobilint/qbcompiler:v0.7-wsl
+$ # Make a docker container
+$ cd {WORKING DIRCTORY}
+$ docker run -it --gpus all --name mxq_compiler -v $(pwd):/data mobilint/qbcompiler:v0.7-wsl
+```
+
 ### Installation of qubee
 Run the following commands to install qubee on the docker container.
 ```bash
-$ # Download qubee-0.7.7-py3-none-any.whl file
+$ # Download qubee-0.7.11-py3-none-any.whl file
 $ # Copy qubee whl file to Docker
-$ docker cp {Path to qubee-0.7.7-py3-none-any.whl} mxq_compiler:/
+$ docker cp {Path to qubee-0.7.11-py3-none-any.whl} mxq_compiler:/
 $ # Start docker
 $ docker start mxq_compiler
 $ # Attach docker
 $ docker exec -it mxq_compiler /bin/bash
 $ # Install qubee
 $ cd /
-$ python -m pip install qubee-0.7.7-py3-none-any.whl
+$ python -m pip install qubee-0.7.11-py3-none-any.whl
 ```
 
 # Tutorials
@@ -253,7 +267,7 @@ mxq_compile(
 ```
  
 ## Compiling PyTorch Models
-PyTorch models can be compiled in two different ways. The first approach involves converting the PyTorch model to ONNX, which is then further converted into Mobilint IR. The second approach involves converting the PyTorch model to TVM, which is then further converted into Mobilint IR. Once the model is converted to Mobilint IR, then it is be compiled into MXQ. Examples of the code are shown below. The following codes assume that the calibration dataset is prepared in directory `/workspace/cali_imagenet`.
+PyTorch models can be compiled in three different ways. The first approach involves converting the PyTorch model to ONNX, which is then further converted into Mobilint IR. The second approach involves converting the PyTorch model to TVM, which is then further converted into Mobilint IR. The third approach involves converting the PyTorch model to Torchscript, which is then further converted into Mobilint IR. Once the model is converted to Mobilint IR, then it is be compiled into MXQ. Examples of the code are shown below. The following codes assume that the calibration dataset is prepared in directory `/workspace/cali_imagenet`.
 
 ```python
 """ Compile PyTorch model, first way """
@@ -281,6 +295,7 @@ mxq_compile(
 ```python
 from qubee import mxq_compile
 ### get resnet18 from torchvision 
+import torch
 import torchvision
 torch_model = torchvision.models.resnet18(pretrained=True) 
 calib_data_path = "/workspace/cali_imagenet"
@@ -294,7 +309,31 @@ mxq_compile(
     input_shape=(224, 224, 3)
 )
 ```
- 
+
+```python
+from qubee import mxq_compile
+### get resnet18 from torchvision 
+import torchvision
+calib_data_path = "/workspace/cali_imagenet"
+# A calibration meta file such as "/workspace/cali_imagenet.txt" can be used instead.
+
+### get resnet18 from torchvision and convert it to torchscript
+torch_model = torchvision.models.resnet18(pretrained=True) 
+torchscript_model_path = "/workspace/resnet18.pt"
+
+example_input = torch.rand(1, 3, 224, 224)
+scripted_model = torch.jit.script(torch_model, example_input)
+torch.jit.save(scripted_model, torchscript_model_path)
+
+mxq_compile(
+    model=torchscript_model_path,
+    calib_data_path=calib_data_path,
+    backend="torchscript",
+    save_path="resnet18.mxq",
+    example_input=example_input
+)
+```
+
 ## Compiling Keras Models
 Keras models are converted to TVM, and further converted into Mobilint IR. Once the model is converted to Mobilint IR, then it is be compiled into MXQ. An example of the code is shown below. The following code assumes that the calibration dataset is prepared in directory `/workspace/cali_imagenet`.
 
