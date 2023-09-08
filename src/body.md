@@ -8,7 +8,7 @@ Inputs to qubee are a trained deep learning model, its input shape, and calibrat
 @<img:media/qubee.jpg;0.75;Input and output of qubee>
 
 # Changelog
-## qubee v0.7.12 (Sep 2023)
+## qubee v0.7.11 (Sep 2023)
 API
     Torchscript Backend
 
