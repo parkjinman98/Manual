@@ -65,8 +65,14 @@ Available at https://dl.mobilint.com/view.php. Download after signing up for an 
 ### Before You Write
 #### Template
 
-Prepare a template file in the `YourProjectFolder/Profiles/Common/bin/codegen` folder to set a standardized style and format. The template file should be named `docgen_template_{custom_name}.docx`. The template file should be prepared in the following format.
-- Title style
+Prepare a template file in the `YourProjectFolder/Profiles/Common/bin/codegen` folder to set a standardized style and format. The template file should be named `docgen_template_{custom_name}.docx`.
+
+It is recommended to start with the existing template file, and the following process is an example of editing the template file using Microsoft Word.
+1. Open the template file in Microsoft Word.
+2. Press `Alt+F9` to display the field codes.
+3. Find the properties that you want to modify the style and format, and modify them.
+
+For example, if you want to modify the title style, find the field code including `DOCPROPERTY Comprehensive_IP_Title`. Then, apply the custom style to the object corresponding to the field code.
 
 #### Lua Script
 1. Properties
