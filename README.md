@@ -12,7 +12,7 @@ Set Microsoft Word's equation editor to LaTeX. To do this, go to `Insert` -> `Eq
 
 #### Method 1: [Direct Download](https://testdrive-profiling-master.github.io/download/TestDrive_Profiling_Master.exe)
 
-#### Method 2: Installable Package by Git **(Recommended)**
+#### Method 2: Installable Package by Git 
 1. Install from repositories
     ```bash
     cd YourInstallationFolder
@@ -30,10 +30,10 @@ Set Microsoft Word's equation editor to LaTeX. To do this, go to `Insert` -> `Eq
     TestDrive.exe
     ```
 
-#### Method 3: Mobilint® Software Development Kit (SDK)
+#### Method 3: Mobilint® Software Development Kit (SDK) **(Recommended)**
 Available at https://dl.mobilint.com/view.php. Download after signing up for an account.
 
-* **Issue**: During installation, the installer requests the user to log in at https://repo.mobilint.com/user/login. 
+* **Issue**: During installation, the installer requests the user to log in at https://repo.mobilint.com/user/login. If you need access, please contact <jisung@mobilint.co>.
 
 ### Post-Installation
 0. Reboot the system before installing the external tools. Therefore, the environment variables are updated.
