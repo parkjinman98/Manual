@@ -342,57 +342,32 @@ mxq_compile(
 )
 ```
 
-## Compiling Keras Models
-Keras models are converted to TVM, and further converted into Mobilint IR. Once the model is converted to Mobilint IR, then it is be compiled into MXQ. An example of the code is shown below. The following code assumes that the calibration dataset is prepared in directory `/workspace/cali_imagenet`.
+## Compiling Keras/TensorFlow Models
+Since Keras works as an interface for TensorFlow 2, Keras models can be converted to Mobilint IR via TensorFlow. First, we load and save the Keras/TensorFlow model into the format of frozen graph, which ends with `.pb`. Then, with the directory containing the frozen graph, qubee will compile the model. The following code assumes that the calibration dataset is prepared in directory `/workspace/calibration/resnet50`.
 
+@<b>Remark@</b> According to the annotations and old version instructions, the TensorFlow compilation should work by simply providing the directory containing the frozen graph, or just the frozen graph file. However, the current version make various errors, such as kernel parsing error, incompatible tag error, etc. We are currently working on this issue.
 ```python
-""" Compile Keras model """ 
+""" Compile Keras/TensorFlow model """ 
 from qubee import mxq_compile
-import tensorflow.keras as keras 
+import tensorflow as tf
 
-keras_model = keras.applications.resnet18.ResNet18() 
+keras_model = tf.keras.applications.resnet50.ResNet50() # Load a Keras model
 input_shape = (224, 224, 3) 
-calib_data_path = "/workspace/cali_imagenet"
-# A calibration meta file such as "/workspace/cali_imagenet.txt" can be used instead.
+calib_data_path = "/workspace/calibration/resnet50"
+# A calibration meta file such as "/workspace/calibration/resnet50.txt" can be used instead.
+
+keras_model_save_path = "/workspace/tf_models/resnet50" # directory to save the model
+keras_model.save(keras_model_save_path) # Save the model in the format of frozen graph. saved_model.pb file will be created in the directory.
+keras_model.summary() # if you are not aware of the input name, you can check it by this command.
 
 mxq_compile(
-    model=keras_model,
+    model=keras_model_save_path,
     calib_data_path=calib_data_path,
-    backend="tvm",
+    backend="tf1", # or "tf2". It will be unified to "tf" in the future.
     save_path="resnet50.mxq",
-    input_shape=(224, 224, 3)
+    input_shape={'input_1':(224, 224, 3)} # dictionary of input shape
 )
 ```
- 
-## Compiling TensorFlow Models
-qubee supports TensorFlow up to version 1.15. So, it requires a frozen TensorFlow PB graph as input, which will be parsed and converted to Mobilint IR. Once the model is converted to Mobilint IR, then it is be compiled into MXQ. An example of the code is shown below. The following code assumes that the calibration dataset is prepared in directory `/workspace/cali_imagenet`.
- 
-```python
-""" Compile Tensorflow model """ 
-from qubee import mxq_compile
-import wget
-import os
-
-### download tensorflow resnet50 from zenodo website 
-tf_model = 'resnet50_v1.pb' 
-if os.path.isfile(tf_model):
-    print('Found cached model: {}'.format(tf_model)) 
-else:
-    print('Downloading model: {}'.format(tf_model)) 
-tf_model = wget.download('https://zenodo.org/record/2535873/files/resnet50_v1.pb') 
-
-input_shape = (224, 224, 3) 
-calib_data_path = "/workspace/cali_imagenet"
-# A calibration meta file such as "/workspace/cali_imagenet.txt" can be used instead.
-mxq_compile(
-    model=tf_model,
-    calib_data_path=calib_data_path,
-    backend="tf",
-    save_path="resnet50.mxq",
-    input_shape=(224, 224, 3)
-)
-```
- 
 # CPU Offloading
 From qubee v0.7, we provide Beta version of CPU offloading for mxq compile. CPU offloading makes it easier for users to compile their models by automatically offloading the computation that are not supported by Mobilint NPU to the CPU. For example, if a pre-processing or post-processing included in the model involves operations that are not supported by the NPU, the user would have to implement them manually after compile, but CPU offloading covers most of these operations and eliminates the need for additional work.
 
