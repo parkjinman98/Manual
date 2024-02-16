@@ -102,9 +102,9 @@ $ # mkdir {WORKING DIRCTORY}
 $ cd {WORKING DIRCTORY}
 $ docker run -it --gpus all --ipc=host --name mxq_compiler -v $(pwd):/workspace mobilint/qbcompiler:v0.8.1
 ```
-(Recommended) If the trained models and calibration dataset are stored in different directories, you can mount them to the docker container as follows:
+(Recommended) If the trained models and datasets are stored in different directories, you can mount them to the docker container as follows:
 ```bash
-$ docker run -it --gpus all --ipc=host --name mxq_compiler -v $(pwd):/workspace -v {PATH TO MODEL DIR}:/models -v {PATH TO CALIBRATION DATASET DIR}:/datasets mobilint/qbcompiler:v0.8.1
+$ docker run -it --gpus all --ipc=host --name mxq_compiler -v $(pwd):/workspace -v {PATH TO MODEL DIR}:/models -v {PATH TO DATASET DIR}:/datasets mobilint/qbcompiler:v0.8.1
 ```
 
 (Option, not available yet) Build the docker image for WSL2
@@ -117,7 +117,7 @@ $ docker run -it --gpus all --ipc=host --name mxq_compiler -v $(pwd):/data mobil
 ```
 
 ### Installation of qubee
-qubee compiler packages are available in @<link:https://dl.mobilint.com/view.php ;Mobilint® Software Development Kit (SDK)>
+qubee compiler packages are available in @<link:https://dl.mobilint.com/view.php ;Mobilint® Software Development Kit (SDK)>.
 
 Run the following commands to install qubee on the docker container.
 ```bash
@@ -155,7 +155,7 @@ To compile the model, you should prepare the calibration dataset (the pre-proces
 (i) Pre-process the raw calibration dataset and save it as numpy tensors.
 (ii) Utilize a pre-processing configuration YAML file (only for images with @<b>uniform format@</b>).
 (iii) Use a manually defined pre-processing function (only for images with @<b>uniform format@</b>).
-(iv) Use Mobilint® Processor (will be available soon)
+(iv) Use @<link:http://git.mobilint/AlgorithmGroup/Calibration_GUI;Mobilint® Calibration GUI Tool>
 
 @<b> Important @</b> The process of making a calibration dataset may vary depending on whether you compile the model for CPU offloading or not. Currently, qubee compiles the model without CPU offloading by default. In this scenario, the pre-processed input shape should be in the format (H, W, C). On the other hand, when CPU offloading is employed, the pre-processed input shape should match the input shape that the original model takes.
 
@@ -272,6 +272,11 @@ The above results are in a directory containing the pre-processed calibration da
 
 @<b>Remark@</b> Unless the custom pre-processing function contains proper exception handling, the sample dataset for calibration should be composed of images with the same format. Like the previous method, the calibration dataset will not be created properly if some are in color images and others are in grayscale images.
 
+### Use Mobilint® Calibration GUI Tool
+@<link:http://git.mobilint/AlgorithmGroup/Calibration_GUI; Mobilint® Calibration GUI> is a tool that helps users to make the calibration dataset. With a prepared dataset of image files, users can easily generate a pre-processed calibration dataset of npy files. The tool provides pre-defined pre-processing functions for various deep learning models.
+
+@<img:media/mobilint_calibration_gui.jpg;0.75; Mobilint® Calibration GUI>
+
 ## Compiling ONNX Models
 ONNX model is recommended to use for compiling the trained model. With simple code, the ONNX model can be directly parsed to obtain Mobilint IR.  example code is shown below. The following code assumes that the calibration dataset and the model are prepared in the directory `/workspace/calibration/resnet50` and `/workspace/resnet50.onnx`, respectively.
 
@@ -343,10 +348,10 @@ mxq_compile(
 )
 ```
 
-## Compiling Keras/TensorFlow Models
-Since Keras works as an interface for TensorFlow 2, models on the Keras framework can be converted to Mobilint IR via TensorFlow. First, we load and save the Keras/TensorFlow model into the format of the frozen graph, which ends with `.pb`. Then, with the directory containing the frozen graph, qubee will compile the model. The following code assumes the calibration dataset is prepared in the directory `/workspace/calibration/resnet50`.
+## Compiling TensorFlow/Keras Models
+Since Keras works as an interface for TensorFlow, models on the Keras framework can be converted to Mobilint IR via TensorFlow. First, we load and save the Keras/TensorFlow model into the format of the frozen graph, which ends with `.pb`. Then, with the directory containing the frozen graph, qubee will compile the model. The following code assumes the calibration dataset is prepared in the directory `/workspace/calibration/resnet50`.
 
-@<b>Remark@</b> According to the annotations and old version instructions, the TensorFlow compilation should work by providing the directory containing the frozen graph or just the frozen graph file. However, the current version makes various errors, such as kernel parsing errors, incompatible tag errors, etc. We are currently working on this issue.
+@<b>@<color:FF0000>Important@</color:FF0000>@</b> According to the annotations and old version instructions, the TensorFlow compilation should work by providing the directory containing the frozen graph or just the frozen graph file. However, the current version of qubee has minor but critical bug in the TensorFlow parser. It is now fixed and will be released in the next version. For now, please use the ONNX or PyTorch model to compile the model.
 ```python
 """ Compile Keras/TensorFlow model """ 
 from qubee import mxq_compile
@@ -388,16 +393,15 @@ When CPU offloading is employed, the procedures for preparing the calibration da
  
 ## Supported operations (PyTorch)
 
-@<b>Remark@</b> Since the Torchscript backend framework is based on @<link:https://pytorch.org/docs/stable/onnx.html#Torchscript-Based-ONNX-Exporter;Torchscript-Based-ONNX-Exporter>, even if the operation is not listed below, it can be supported if it has corresponding ONNX operation.
+@<b>Remark@</b> Since the Torchscript backend framework is based on @<link:https://pytorch.org/docs/stable/onnx.html#Torchscript-Based-ONNX-Exporter;Torchscript-Based-ONNX-Exporter>, even if the operation is not listed below, it may be supported if it has corresponding ONNX operation, which is supported by qubee.
 
 @<tbl:media/supported_pytorch.xlsx;Sheet1;PyTorch Supported Operations>
  
-## Supported operations (TensorFlow)
+## Supported operations (TensorFlow/Keras)
+As mentioned in the previous section, Keras works as an interface for TensorFlow 2, and they save the model in the same format as the frozen graph, which ends with `.pb`. Therefore, the TensorFlow/Keras operation is supported if it can be described by TensorFlow raw operations listed below when the model is saved in the format of the frozen graph.
+
 @<tbl:media/supported_tf.xlsx;Sheet1;TensorFlow Supported Operations>
- 
-## Supported operations (Keras)
-@<tbl:media/supported_keras.xlsx;Sheet1;Keras Supported Operations>
- 
+
 # API Reference
 ## Class: Model_Dict
 This class serves two main functions:

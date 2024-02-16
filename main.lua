@@ -8,7 +8,7 @@ property["IP_Name_Header"]			= "Developers Guide" -- IP Name for the header
 property["Ownership"]				= "Mobilint" -- Owner
 property["Document_Name_Header"]	= "Developers Guide" -- Document Name for the header
 property["Security_Level"]			= "Mobilint Confidential" -- Security Level of the document. This will be displayed in header of title pages and footer of contents.
-property["Water_Mark"]				= "Mobilint Confidential" -- Watermark(empty when no need)
+property["Water_Mark"]				= "Confidential" -- Watermark(empty when no need)
 
 AddRevision("0.2", 2021, 12, 01, "Revised for v0.2")
 AddRevision("0.3", 2022, 02, 05, "Revised for v0.3")
