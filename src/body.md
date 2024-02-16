@@ -316,6 +316,7 @@ mxq_compile(
 )
 ```
 
+
 ```python
 """ Compile PyTorch model, second way """
 from qubee import mxq_compile
@@ -343,9 +344,9 @@ mxq_compile(
 ```
 
 ## Compiling Keras/TensorFlow Models
-Since Keras works as an interface for TensorFlow 2, Keras models can be converted to Mobilint IR via TensorFlow. First, we load and save the Keras/TensorFlow model into the format of frozen graph, which ends with `.pb`. Then, with the directory containing the frozen graph, qubee will compile the model. The following code assumes that the calibration dataset is prepared in directory `/workspace/calibration/resnet50`.
+Since Keras works as an interface for TensorFlow 2, models on the Keras framework can be converted to Mobilint IR via TensorFlow. First, we load and save the Keras/TensorFlow model into the format of the frozen graph, which ends with `.pb`. Then, with the directory containing the frozen graph, qubee will compile the model. The following code assumes the calibration dataset is prepared in the directory `/workspace/calibration/resnet50`.
 
-@<b>Remark@</b> According to the annotations and old version instructions, the TensorFlow compilation should work by simply providing the directory containing the frozen graph, or just the frozen graph file. However, the current version make various errors, such as kernel parsing error, incompatible tag error, etc. We are currently working on this issue.
+@<b>Remark@</b> According to the annotations and old version instructions, the TensorFlow compilation should work by providing the directory containing the frozen graph or just the frozen graph file. However, the current version makes various errors, such as kernel parsing errors, incompatible tag errors, etc. We are currently working on this issue.
 ```python
 """ Compile Keras/TensorFlow model """ 
 from qubee import mxq_compile
@@ -369,16 +370,16 @@ mxq_compile(
 )
 ```
 # CPU Offloading
-From qubee v0.7, we provide Beta version of CPU offloading for mxq compile. CPU offloading makes it easier for users to compile their models by automatically offloading the computation that are not supported by Mobilint NPU to the CPU. For example, if a pre-processing or post-processing included in the model involves operations that are not supported by the NPU, the user would have to implement them manually after compile, but CPU offloading covers most of these operations and eliminates the need for additional work.
+From qubee v0.7, we provide a Beta version of CPU offloading for mxq compile. CPU offloading makes it easier for users to compile their models by automatically offloading the computation that Mobilint NPU does not support to the CPU. For example, if a pre-processing or post-processing included in the model involves operations that the NPU does not support, the user would have to implement them manually after compiling, but CPU offloading covers most of these operations and eliminates the need for additional work.
 
 When CPU offloading is employed, the procedures for preparing the calibration dataset and compiling the model vary slightly as follows: 
-(i) The pre-processed input shape should match the input shape that the original model takes, whereas the pre-processed input shape should be in the format (H, W, C) to compile the model without CPU offloading. 
+(i) The pre-processed input shape should match the original model's input shape, whereas the pre-processed input shape should be in the format (H, W, C) to compile the model without CPU offloading. 
 (ii) Set the argument @<i>cpu_offload@</i> of function @<i>mxq_compile@</i> True to enable CPU offloading.
 
 @<img:media/offloading_fig.svg;0.85;SDK CPU Offloading>
  
 # Supported Frameworks
- We support almost all the commonly used Machine Learning frameworks & libraries such as ONNX, TVM, PyTorch, Keras, and TensorFlow.
+ We support almost all the commonly used Machine Learning frameworks & libraries such as ONNX, PyTorch, Keras, and TensorFlow.
 
 @<img:#media/supported_frameworks.png;1.0;Supported deep-learning frameworks>
 
@@ -386,6 +387,9 @@ When CPU offloading is employed, the procedures for preparing the calibration da
 @<tbl:media/supported_onnx.xlsx;Sheet1;ONNX Supported Operations>
  
 ## Supported operations (PyTorch)
+
+@<b>Remark@</b> Since the Torchscript backend framework is based on @<link:https://pytorch.org/docs/stable/onnx.html#Torchscript-Based-ONNX-Exporter;Torchscript-Based-ONNX-Exporter>, even if the operation is not listed below, it can be supported if it has corresponding ONNX operation.
+
 @<tbl:media/supported_pytorch.xlsx;Sheet1;PyTorch Supported Operations>
  
 ## Supported operations (TensorFlow)
@@ -424,8 +428,8 @@ Compile a given model directly without creating an instance of "Model_Dict".
 @<tbl:media/mxq_compile.xlsx;Sheet1;mxq_compile>
  
 ### Tips for choosing quantization methods
-"Percentile" and "MaxPercentile" quantization methods each take a hyperparameter called @<i>percentile@</i>. An increase in this value corresponds to a wider quantization interval. To elaborate further, a higher @<i>percentile@</i> results in reduced overflow, albeit at the expense of accuracy.
-"MaxPercentile" method determines the percentile value from data that has been filtered once. As a result, a lower @<i>percentile@</i> is needed for "MaxPercentile" compared to the "Percentile" method. For instance, for "Percentile" method, we suggest using a value in the range of 0.9999 to 0.999999. For "MaxPercentile" method, we recommend @<i>percentile@</i> between 0.9 and 0.9999.
+"Percentile" and "MaxPercentile" quantization methods each take a hyperparameter called @<i>percentile@</i>. An increase in this value corresponds to a broader quantization interval. To elaborate further, a higher @<i>percentile@</i> results in reduced overflow, albeit at the expense of accuracy.
+The "MaxPercentile" method determines the percentile value from data that has been filtered once. As a result, a lower @<i>percentile@</i> is needed for "MaxPercentile" compared to the "Percentile" method. For instance, for the "Percentile" method, we suggest using a value of 0.9999 to 0.999999. For the "MaxPercentile" method, we recommend @<i>percentile@</i> between 0.9 and 0.9999.
 
 ## Function: make_calib
 From given images and preprocessing configuration, create the preprocessed numpy files and a txt file containing their paths.
@@ -435,28 +439,7 @@ From given images and preprocessing configuration, create the preprocessed numpy
 From given images and manually written function that takes an image path as input, create the preprocessed numpy files and a txt file containing their paths.
 @<tbl:media/make_calib_man.xlsx;Sheet1;make_calib_man>
  
-For example, you can use this as follows:
- 
-```python
-import cv2
-import numpy as np
-from qubee import make_calib_man
-
-def pre_ftn(img_path: str):
-    x = cv2.imread(img_path, cv2.IMREAD_COLOR)
-    x = x.astype(np.float32) / 255.
-    x -= 0.01
-    x *= 1.3
-    return x
-
-make_calib_man(
-    pre_ftn=pre_ftn,
-    save_dir="calibration",
-    data_dir="/workspace/datasets/color_samples",
-    save_name="color_test")
-```
- 
-The above results in a directory containing the pre-processed calibration dataset, located at "/workspace/datasets/color_samples".
+Example codes for using these functions are provided in the @<link:##Preparing Calibration Data> section.
 
 ## Pre-processing Configurations
 qubee supports the following pre-processing functions to make calibration data.
@@ -490,7 +473,7 @@ SetOrder:
 ### Pre-processing Parameters
 @<tbl:media/pre_process.GetImage.xlsx;Sheet1;GetImage>
  
-@<tbl:media/pre_process.Pad.xlsx;Sheet1;Padding>
+@<tbl:media/pre_process.Pad.xlsx;Sheet1;Pad>
  
 @<tbl:media/pre_process.Normalize.xlsx;Sheet1;Normalize>
  
