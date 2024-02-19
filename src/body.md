@@ -477,7 +477,7 @@ SetOrder:
 ### Pre-processing Parameters
 @<tbl:media/pre_process.GetImage.xlsx;Sheet1;GetImage>
  
-@<tbl:media/pre_process.Pad.xlsx;Sheet1;Padding>
+@<tbl:media/pre_process.Pad.xlsx;Sheet1;Pad>
  
 @<tbl:media/pre_process.Normalize.xlsx;Sheet1;Normalize>
  
