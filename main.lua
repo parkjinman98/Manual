@@ -1,7 +1,7 @@
 -- Document Properties for title, author, etc.
-property["Document_Name"]			= "Model Compiler Suite for Aries™" --Document Name
-property["IP_Version"]				= "v0.8.1" -- Version
-property["Comprehensive_IP_Title"]	= "Model Compiler Suite for Aries" --Comprehensive IP Title. This will be used in the document title page.
+property["Document_Name"]			= "Model Compiler Suite for Aries™" -- Document Name
+property["IP_Version"]				= "v0.8.3" -- Version
+property["Comprehensive_IP_Title"]	= "Model Compiler Suite for Aries" -- Comprehensive IP Title. This will be used in the document title page.
 property["IP_Name_First_Page"]		= "Developers Guide" -- IP Name for the first page
 property["Business_Unit"]			= "Algorithm" -- 
 property["IP_Name_Header"]			= "Developers Guide" -- IP Name for the header
@@ -24,5 +24,7 @@ AddRevision("0.7.11", 2023, 08, 31, "Revised for v0.7.11")
 AddRevision("0.7.12", 2023, 09, 12, "Revised for v0.7.12")
 AddRevision("0.8.0", 2023, 11, 02, "Revised for v0.8.0")
 AddRevision("0.8.1", 2023, 12, 08, "Revised for v0.8.1")
+AddRevision("0.8.2", 2024, 02, 23, "Revised for v0.8.2")
+AddRevision("0.8.3", 2024, 03, 07, "Revised for v0.8.3")
 
 AddParagraph("[[src/body.md]]")

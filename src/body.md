@@ -9,15 +9,21 @@ Inputs to qubee are a trained deep learning model, its input shape, and calibrat
 
 # Changelog
 
+## qubee v0.8.3 (March 2024)
+
+## qubee v0.8.2 (February 2024)
+
 ## qubee v0.8.1 (December 2023)
 
 ## qubee v0.8.0 (November 2023)
+API
+    TVM backend deprecated
 
 ## qubee v0.7.12 (September 2023)
 
 ## qubee v0.7.11 (August 2023)
 API
-    Torchscript Backend
+    Support TorchScript backend
 
 ## qubee v0.7.10 (August 2023)
 
@@ -27,7 +33,7 @@ API
 
 ## qubee v0.7.7 (June 2023)
 API
-    CPU offloading (beta version)
+    Improve CPU offloading (beta version)
 Improve CPU efficiency
 Support more operations
 Docker
@@ -39,8 +45,8 @@ Docker
 Multi-channel quantization
 Support more operations
 API
-    Calibration dataset
-CPU Offloading (Beta Version)
+    Improve calibration dataset processing
+    Support CPU offloading (beta version)
 
 ## qubee v0.6 (August 2022)
 Minor updates
@@ -77,43 +83,51 @@ We recommend to use NVIDIA GPU for faster compile wtih qubee, but it is not nece
 
 ### Reference System
 ```vim
-Ubuntu 20.04.4 LTS
-NVIDIA Graphics Driver 525.147.05
+Ubuntu 22.04.4 LTS
+NVIDIA Graphics Driver 545.29.06
 ```
  
-### Recommended Packages
+### Requirements and Recommended Packages
 ```vim
+Ubuntu 20.04.6 LTS or Above
 NVIDIA Graphics Driver 450.80.02 or Above
 Docker
 nvidia-docker
 ```
  
 ## SDK Installation
-We recommend installing qubee on the mobilint docker container. 
-(Docker image: mobilint/qbcompiler:v0.8.1, @<link:https://hub.docker.com/r/mobilint/qbcompiler>)
+We recommend installing qubee on the Mobilint docker container. 
+(Docker image: mobilint/qbcompiler:v0.8, @<link:https://hub.docker.com/r/mobilint/qbcompiler>)
 
-### Building Docker Image
-Run the following commands to build the docker image.
+### Building Docker Container
+Run the following commands to build the docker container.
 ```bash
-$ # Docker image download
-$ docker pull mobilint/qbcompiler:v0.8.1
-$ # Make a docker container (if needed)
-$ # mkdir {WORKING DIRCTORY}
+$ # Download Docker Image
+$ docker pull mobilint/qbcompiler:v0.8
+$ # mkdir {WORKING DIRCTORY} (if needed)
 $ cd {WORKING DIRCTORY}
-$ docker run -it --gpus all --ipc=host --name mxq_compiler -v $(pwd):/workspace mobilint/qbcompiler:v0.8.1
+$ docker run -it --gpus all --ipc=host --name {YOUR_CONTAINER_NAME} -v $(pwd):/workspace mobilint/qbcompiler:v0.8 /bin/bash
 ```
 (Recommended) If the trained models and datasets are stored in different directories, you can mount them to the docker container as follows:
 ```bash
-$ docker run -it --gpus all --ipc=host --name mxq_compiler -v $(pwd):/workspace -v {PATH TO MODEL DIR}:/models -v {PATH TO DATASET DIR}:/datasets mobilint/qbcompiler:v0.8.1
+$ docker run -it --gpus all --ipc=host --name {YOUR_CONTAINER_NAME} -v $(pwd):/workspace -v {PATH TO MODEL DIR}:/models -v {PATH TO DATASET DIR}:/datasets mobilint/qbcompiler:v0.8 /bin/bash
+```
+(Optional) Build the docker image for CPU only version
+```bash
+$ # Download Docker Image
+$ docker pull mobilint/qbcompiler:v0.8-cpu
+$ cd {WORKING DIRCTORY}
+$ docker run -it --ipc=host --name {YOUR_CONTAINER_NAME} -v $(pwd):/workspace mobilint/qbcompiler:v0.8-cpu /bin/bash
 ```
 
-(Option, not available yet) Build the docker image for WSL2
+
+(Optional, the latest version is not available yet) Build the docker image for WSL2
 ```bash
-$ # Docker image download
-$ docker pull mobilint/qbcompiler:v0.8.1-wsl
+$ # Download Docker Image
+$ docker pull mobilint/qbcompiler:v0.7-wsl
 $ # Make a docker container
 $ cd {WORKING DIRCTORY}
-$ docker run -it --gpus all --ipc=host --name mxq_compiler -v $(pwd):/data mobilint/qbcompiler:v0.8.1-wsl
+$ docker run -it --gpus all --ipc=host --name {YOUR_CONTAINER_NAME} -v $(pwd):/data mobilint/qbcompiler:v0.7-wsl
 ```
 
 ### Installation of qubee
@@ -121,27 +135,27 @@ qubee compiler packages are available in @<link:https://dl.mobilint.com/view.php
 
 Run the following commands to install qubee on the docker container.
 ```bash
-$ # Download qubee-0.8.1-py3-none-any.whl file
+$ # Download qubee-0.8.3-py3-none-any.whl file
 $ # Copy qubee whl file to Docker
-$ docker cp {Path to qubee-0.8.1-py3-none-any.whl} mxq_compiler:/
-$ # Start docker
-$ docker start mxq_compiler
-$ # Attach docker
-$ docker exec -it mxq_compiler /bin/bash
-$ # Install qubee
+$ docker cp {Path to qubee-0.8.3-py3-none-any.whl} {YOUR_CONTAINER_NAME}:/
+$ # Start Docker
+$ docker start {YOUR_CONTAINER_NAME}
+$ # Attach to Docker container
+$ docker exec -it {YOUR_CONTAINER_NAME} /bin/bash
+$ # Install qubee compiler
 $ cd /
-$ python -m pip install qubee-0.8.1-py3-none-any.whl
+$ python -m pip install qubee-0.8.3-py3-none-any.whl
 ```
 
 (Option, for WSL2) Run the following commands to install qubee on the docker container.
 ```bash
 $ # Download qubee-0.8.1_wsl-py3-none-any.whl file
 $ # Copy qubee whl file to Docker
-$ docker cp {Path to qubee-0.8.1_wsl-py3-none-any.whl} mxq_compiler:/
-$ # Start docker
-$ docker start mxq_compiler
-$ # Attach docker
-$ docker exec -it mxq_compiler /bin/bash
+$ docker cp {Path to qubee-0.8.1_wsl-py3-none-any.whl} {YOUR_CONTAINER_NAME}:/
+$ # Start Docker
+$ docker start {YOUR_CONTAINER_NAME}
+$ # Attach to Docker container
+$ docker exec -it {YOUR_CONTAINER_NAME} /bin/bash
 $ # Install qubee
 $ cd /
 $ python -m pip install qubee-0.8.1_wsl-py3-none-any.whl
@@ -155,14 +169,14 @@ To compile the model, you should prepare the calibration dataset (the pre-proces
 (i) Pre-process the raw calibration dataset and save it as numpy tensors.
 (ii) Utilize a pre-processing configuration YAML file (only for images with @<b>uniform format@</b>).
 (iii) Use a manually defined pre-processing function (only for images with @<b>uniform format@</b>).
-(iv) Use @<link:http://git.mobilint/AlgorithmGroup/Calibration_GUI;Mobilint® Calibration GUI Tool>
+(iv) Use @<link:https://git.mobilint.com/algorithm-team/utility/calibration_gui;Mobilint® Calibration GUI Tool>
 
 @<b> Important @</b> The process of making a calibration dataset may vary depending on whether you compile the model for CPU offloading or not. Currently, qubee compiles the model without CPU offloading by default. In this scenario, the pre-processed input shape should be in the format (H, W, C). On the other hand, when CPU offloading is employed, the pre-processed input shape should match the input shape that the original model takes.
 
 ### Pre-process raw calibration dataset and save it as numpy tensors
 You can save the pre-processed calibration dataset as numpy tensors with your custom pre-processing function and use them to compile the model. 
 
-An example code is shown below. The following code assumes that we hold an image folder consisting of 1000 randomly selected images from the Imagenet dataset for calibration prepared in directory `/datasets/imagenet/cali_1000`.
+An example code is shown below. The following code assumes that we have an image folder consisting of 1000 randomly selected JPEG image files from the @<link:https://www.image-net.org/;ImageNet> dataset for calibration prepared in directory `/datasets/imagenet/cali_1000`.
 
 ```python
 import os
@@ -193,7 +207,7 @@ if __name__ == "__main__":
         np.save(fpath, x)
 ```
  
-The above results in a directory containing the pre-processed calibration dataset (numpy tensors of shape (224,224, 3)), located at `/workspace/calibration/custom_single_input`.
+The above results are in a directory containing the pre-processed calibration dataset (numpy tensors of shape (224,224, 3)), located at `/workspace/calibration/custom_single_input`.
 
 ### Use a pre-processing configuration YAML file
 Image pre-processing techniques such as resizing, cropping, and normalization are often applied in machine vision tasks. Users can construct a pre-processing configuration using a YAML file and prepare the calibration dataset via the API provided by qubee, @<i>make_calib@</i>. Please be aware that this method can only be employed when the raw data is an image. An example code is shown below. The following code assumes that images for calibration are prepared in the directory `/workspace/cali_1000`.
@@ -278,7 +292,7 @@ The above results are in a directory containing the pre-processed calibration da
 @<img:media/mobilint_calibration_gui.jpg;0.75; Mobilint® Calibration GUI>
 
 ## Compiling ONNX Models
-ONNX model is recommended to use for compiling the trained model. With simple code, the ONNX model can be directly parsed to obtain Mobilint IR.  example code is shown below. The following code assumes that the calibration dataset and the model are prepared in the directory `/workspace/calibration/resnet50` and `/workspace/resnet50.onnx`, respectively.
+ONNX is a recommended framework to be used for compiling the trained model. With simple code, the ONNX model can be directly parsed to obtain Mobilint IR.  example code is shown below. The following code assumes that the calibration dataset and the model are prepared in the directory `/workspace/calibration/resnet50` and `/workspace/resnet50.onnx`, respectively.
 
 ```python
 """ Compile ONNX model""" 
@@ -296,34 +310,10 @@ mxq_compile(
 ```
  
 ## Compiling PyTorch Models
-PyTorch models can be compiled in two different ways. The first approach involves converting the PyTorch model to ONNX, which is then further converted into Mobilint IR. The second approach involves converting the PyTorch model to Torchscript, which is then further converted into Mobilint IR. Once the model is converted to Mobilint IR, then it is be compiled into MXQ. Examples of the code are shown below. The following codes assume that the calibration dataset is prepared in directory `/workspace/calibration/resnet50`.
+PyTorch models can be compiled in two different ways. The first approach is converting the PyTorch model into the ONNX model with @<link:https://pytorch.org/docs/stable/onnx.html;`torch.onnx`> namespace, and compiling the converted model with the ONNX backend. The second approach is directly plugging the model into the Mobilint IR. Once the model is converted to Mobilint IR, then it is compiled into MXQ. The example code is shown below. The following codes assume that the calibration dataset is prepared in the directory `/workspace/calibration/resnet50`.
 
 ```python
-""" Compile PyTorch model, first way """
-from qubee import mxq_compile
-from qubee.utils import convert_pytorch_to_onnx 
-import torchvision 
-
-input_shape = (224, 224, 3) 
-calib_data_path = "/workspace/calibration/resnet50"
-# A calibration meta file such as "/workspace/calibration/resnet50.txt" can be used instead.
-
-### get resnet50 from torchvision and convert it to ONNX 
-torch_model = torchvision.models.resnet50(pretrained=True) 
-onnx_model_path = "/workspace/resnet50.onnx"
-convert_pytorch_to_onnx(torch_model, input_shape, onnx_model_path) 
-
-mxq_compile(
-    model=onnx_model_path,
-    calib_data_path=calib_data_path,
-    save_path="resnet50.mxq",
-    backend="onnx"
-)
-```
-
-
-```python
-""" Compile PyTorch model, second way """
+""" Compile PyTorch model"""
 from qubee import mxq_compile
 ### get resnet50 from torchvision 
 import torchvision
@@ -351,40 +341,126 @@ mxq_compile(
 ## Compiling TensorFlow/Keras Models
 Since Keras works as an interface for TensorFlow, models on the Keras framework can be converted to Mobilint IR via TensorFlow. First, we load and save the Keras/TensorFlow model into the format of the frozen graph, which ends with `.pb`. Then, with the directory containing the frozen graph, qubee will compile the model. The following code assumes the calibration dataset is prepared in the directory `/workspace/calibration/resnet50`.
 
-@<b>@<color:FF0000>Important@</color:FF0000>@</b> According to the annotations and old version instructions, the TensorFlow compilation should work by providing the directory containing the frozen graph or just the frozen graph file. However, the current version of qubee has minor but critical bug in the TensorFlow parser. It is now fixed and will be released in the next version. For now, please use the ONNX or PyTorch model to compile the model.
+@<b>@<color:FF0000>Important@</color:FF0000>@</b> According to the annotations and old version instructions, the TensorFlow compilation should work by providing the directory containing the frozen graph or just the frozen graph file. However, the current version of qubee has some bugs in the TensorFlow parser. It is now fixed and will be released in the next version. For now, please use the ONNX or PyTorch model to compile the model.
 ```python
-""" Compile Keras/TensorFlow model """ 
+""" Compile Tensorflow Lite model """ 
 from qubee import mxq_compile
 import tensorflow as tf
 
-keras_model = tf.keras.applications.resnet50.ResNet50() # Load a Keras model
+keras_model = tf.keras.applications.resnet50.ResNet50() # Load a pretrained Keras model
 input_shape = (224, 224, 3) 
 calib_data_path = "/workspace/calibration/resnet50"
 # A calibration meta file such as "/workspace/calibration/resnet50.txt" can be used instead.
 
-keras_model_save_path = "/workspace/tf_models/resnet50" # directory to save the model
+keras_model_save_path = "/workspace/tf_models/resnet50" # directory to save the Tensorflow model
 keras_model.save(keras_model_save_path) # Save the model in the format of frozen graph. saved_model.pb file will be created in the directory.
-keras_model.summary() # if you are not aware of the input name, you can check it by this command.
+
+tflite_model = tf.lite.TFLiteConverter.from_saved_model(keras_model_save_path).convert()
+with open('/workspace/tf_models/resnet50.tflite', 'wb') as f:
+    f.write(tflite_model)
 
 mxq_compile(
-    model=keras_model_save_path,
+    model=keras_model_save_path+".tflite",
     calib_data_path=calib_data_path,
-    backend="tf1", # or "tf2". It will be unified to "tf" in the future.
+    backend="tflite",
     save_path="resnet50.mxq",
-    input_shape={'input_1':(224, 224, 3)} # dictionary of input shape
 )
 ```
-# CPU Offloading
+
+## Compiling TensorFlow Lite Models
+The qubee compiler supports TensorFlow Lite models. With the given TensorFlow Lite model, the calibration dataset, and the backend, the model can be compiled into Mobilint IR. The following code assumes the calibration dataset is prepared in the directory `/workspace/calibration/resnet50`.
+
+@<b>@<color:FF0000>Important@</color:FF0000>@</b> Currently, the TensorFlow Lite model is not supported in the qubee compiler. Please use the ONNX or PyTorch model to compile the model.
+
+```python
+""" Compile Tensorflow Lite model """ 
+from qubee import mxq_compile
+import tensorflow as tf
+
+keras_model = tf.keras.applications.resnet50.ResNet50() # Load a pretrained Keras model
+input_shape = (224, 224, 3) 
+calib_data_path = "/workspace/calibration/resnet50"
+# A calibration meta file such as "/workspace/calibration/resnet50.txt" can be used instead.
+
+keras_model_save_path = "/workspace/tf_models/resnet50" # directory to save the Tensorflow model
+keras_model.save(keras_model_save_path) # Save the model in the format of frozen graph. saved_model.pb file will be created in the directory.
+
+tflite_model = tf.lite.TFLiteConverter.from_saved_model(keras_model_save_path).convert()
+with open('/workspace/tf_models/resnet50.tflite', 'wb') as f:
+    f.write(tflite_model)
+
+mxq_compile(
+    model=keras_model_save_path+".tflite",
+    calib_data_path=calib_data_path,
+    backend="tflite",
+    save_path="resnet50.mxq",
+)
+```
+
+## Compling Models with Custom Input
+
+When the model lacks input shape information, qubee may generate the following error:
+```bash
+ValueError: Input node <node name> has more than one unknown shape. Please enter the numpy input array to infer the input shape.
+```
+If you encounter this error, you should provide numpy input arrays along with the model during compilation. Ensure the folder structure is as follows:
+```bash
+- <folder name>
+|- <input node name 1>.npy // only for input node whose shape is unknown.
+|- ...
+|- <input node name n>.npy
+```
+For example, if your model has three inputs named `<input1, input2, input3>` and the shape of `input2` and `input3` are unknown, then you should prepare the numpy array for `input2` and `input3` with the following folder structure.
+
+```bash
+- custom_input_array
+|- input2.npy
+|- input3.npy
+```
+
+With the above array, you can compile the model as follows:
+```python
+# compile_test.py
+import argparse
+ 
+from qubee import mxq_compile
+from qubee.utils.utils_model_dict import parse_custom_input_info
+ 
+onnx_model_path = "/workspace/deeplabv3_mobilenet_v3_large_torchvision.onnx"
+calib_data_path = "/workspace/calibration/deeplabv3"
+ 
+parser = argparse.ArgumentParser(description="Compile arguments")
+parser.add_argument("--input_shape_path", dest="custom_input_shape_dict", action=parse_custom_input_info)
+ 
+ 
+mxq_compile(
+    model=onnx_model_path,
+    calib_data_path=calib_data_path,
+    save_path="deeplabv3.mxq",
+    input_shape_dict=args.custom_input_shape_dict
+    backend="onnx"
+)
+```
+
+Then, you can compile the model with the following command:
+```bash
+python compile_test.py --input_shape_path /workspace/custom_input_array
+```
+
+# CPU Offloading (Beta Version)
+
+@<b>Remark@</b> To proceed inference with CPU offloading, it requires a runtime library that supports the MXQ file that is compiled for CPU offloading.
+
 From qubee v0.7, we provide a Beta version of CPU offloading for mxq compile. CPU offloading makes it easier for users to compile their models by automatically offloading the computation that Mobilint NPU does not support to the CPU. For example, if a pre-processing or post-processing included in the model involves operations that the NPU does not support, the user would have to implement them manually after compiling, but CPU offloading covers most of these operations and eliminates the need for additional work.
 
 When CPU offloading is employed, the procedures for preparing the calibration dataset and compiling the model vary slightly as follows: 
 (i) The pre-processed input shape should match the original model's input shape, whereas the pre-processed input shape should be in the format (H, W, C) to compile the model without CPU offloading. 
 (ii) Set the argument @<i>cpu_offload@</i> of function @<i>mxq_compile@</i> True to enable CPU offloading.
 
-@<img:media/offloading_fig.svg;0.85;SDK CPU Offloading>
+@<img:media/offloading_fig.svg;0.75;SDK CPU Offloading>
  
 # Supported Frameworks
- We support almost all the commonly used Machine Learning frameworks & libraries such as ONNX, PyTorch, Keras, and TensorFlow.
+We support almost all the commonly used Machine Learning frameworks & libraries such as ONNX, PyTorch, Keras, TensorFlow, and TensorFlow Lite.
 
 @<img:#media/supported_frameworks.png;1.0;Supported deep-learning frameworks>
 
@@ -397,12 +473,25 @@ When CPU offloading is employed, the procedures for preparing the calibration da
 
 @<tbl:media/supported_pytorch.xlsx;Sheet1;PyTorch Supported Operations>
  
-## Supported operations (TensorFlow/Keras)
-As mentioned in the previous section, Keras works as an interface for TensorFlow 2, and they save the model in the same format as the frozen graph, which ends with `.pb`. Therefore, the TensorFlow/Keras operation is supported if it can be described by TensorFlow raw operations listed below when the model is saved in the format of the frozen graph.
+## Supported operations (TensorFlow/Keras/TensorFlow Lite)
+As mentioned in the previous section, Keras works as an interface for TensorFlow 2, and they save the model in the same format as the frozen graph, which ends with `.pb`. Therefore, the TensorFlow/Keras/TensorflowLite operation is supported if it can be described by the TensorFlow raw operations listed below when the model is saved in the format of the frozen graph.
 
 @<tbl:media/supported_tf.xlsx;Sheet1;TensorFlow Supported Operations>
 
 # API Reference
+## Function: mxq_compile
+Compile a given model directly without creating an instance of "Model_Dict".
+@<tbl:media/mxq_compile.xlsx;Sheet1;mxq_compile>
+ 
+### Tips for choosing quantization methods
+"Percentile" and "MaxPercentile" quantization methods each take a hyperparameter called @<i>percentile@</i>. An increase in this value corresponds to a broader quantization interval. To elaborate further, a higher @<i>percentile@</i> results in reduced overflow, albeit at the expense of accuracy.
+
+The "MaxPercentile" method determines the percentile value from data that has been filtered once. As a result, a lower @<i>percentile@</i> is needed for "MaxPercentile" compared to the "Percentile" method. For instance, for the "Percentile" method, we suggest using a value of 0.9999 to 0.999999. For the "MaxPercentile" method, we recommend @<i>percentile@</i> between 0.9 and 0.9999.
+
+The "is_quant_ch" argument enables channel-wise quantization. When set to True, the quantization is performed on a per-channel basis. This method is particularly useful for models, in which activations vary significantly across channels. However, it may take a longer time to compile the model.
+
+The "quant_output" argument is used to determine the quantization method for the output layer. When the original model's output is various across the channels, it is recommended to set "ch" to keep channel-wise quantization. Otherwise, set "layer" to quantize the output layer as a whole.
+
 ## Class: Model_Dict
 This class serves two main functions:
 1. Compile
@@ -426,24 +515,15 @@ This class serves two main functions:
  
 @<tbl:media/model_dict.to.xlsx;Sheet1;Model_Dict.to>
  
-
-## Function: mxq_compile
-Compile a given model directly without creating an instance of "Model_Dict".
-@<tbl:media/mxq_compile.xlsx;Sheet1;mxq_compile>
- 
-### Tips for choosing quantization methods
-"Percentile" and "MaxPercentile" quantization methods each take a hyperparameter called @<i>percentile@</i>. An increase in this value corresponds to a broader quantization interval. To elaborate further, a higher @<i>percentile@</i> results in reduced overflow, albeit at the expense of accuracy.
-The "MaxPercentile" method determines the percentile value from data that has been filtered once. As a result, a lower @<i>percentile@</i> is needed for "MaxPercentile" compared to the "Percentile" method. For instance, for the "Percentile" method, we suggest using a value of 0.9999 to 0.999999. For the "MaxPercentile" method, we recommend @<i>percentile@</i> between 0.9 and 0.9999.
-
 ## Function: make_calib
-From given images and preprocessing configuration, create the preprocessed numpy files and a txt file containing their paths.
+From the given images and preprocessing configuration, create the preprocessed numpy files and a txt file containing their paths.
 @<tbl:media/make_calib.xlsx;Sheet1;make_calib>
- 
+ 
 ## Fuction: make_calib_man
 From given images and manually written function that takes an image path as input, create the preprocessed numpy files and a txt file containing their paths.
 @<tbl:media/make_calib_man.xlsx;Sheet1;make_calib_man>
- 
-Example codes for using these functions are provided in the @<link:##Preparing Calibration Data> section.
+ 
+Example codes for using these functions are provided in the @<link:## Preparing Calibration Data> section.
 
 ## Pre-processing Configurations
 qubee supports the following pre-processing functions to make calibration data.
@@ -491,10 +571,6 @@ SetOrder:
  
 
 # Open Source License Notice
-@<b>Apache TVM@</b>
-* @<link:https://github.com/apache/tvm;https://github.com/apache/tvm>
-* Apache 2.0 License
- 
 
 @<b>PyTorch@</b>
 * @<link:https://github.com/pytorch/pytorch;https://github.com/pytorch/pytorch>

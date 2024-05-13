@@ -60,6 +60,9 @@ Available at https://dl.mobilint.com/view.php. Download after signing up for an 
     ./ecilpse/eclipse.exe
     ./notepad/notepad++.exe
     ```
+### Update (Only Available for Method 3 Installation)
+Go to `YourInstallationFolder/Project/Profiles/MobilintCI` and execute `start.bat`. The update process will be automatically executed.
+
 
 ## Writing a User Manual
 ### Before You Write
@@ -80,9 +83,9 @@ For example, if you want to modify the title style, find the field code includin
     The following properties are required to be included in the Lua script.
     ```lua
     -- Document Properties for title, author, etc.
-    property["Document_Name"]           --Document Name
+    property["Document_Name"]           -- Document Name
     property["IP_Version"]              -- Version
-    property["Comprehensive_IP_Title"]  --Comprehensive IP Title. This will be used in the document title page.
+    property["Comprehensive_IP_Title"]  -- Comprehensive IP Title. This will be used in the document title page.
     property["IP_Name_First_Page"]      -- IP Name for the first page
     property["Business_Unit"]           -- Business Unit
     property["IP_Name_Header"]          -- IP Name for the header
@@ -94,7 +97,7 @@ For example, if you want to modify the title style, find the field code includin
     For example,
     ```lua
     property["Document_Name"]           = "Model Compiler Suite for Aries™"
-    property["IP_Version"]              = "v0.7.11"
+    property["IP_Version"]              = "v0.8.1"
     property["Comprehensive_IP_Title"]  = "Model Compiler Suite for Aries"
     property["IP_Name_First_Page"]      = "Developers Guide"
     property["Business_Unit"]           = "Software"
