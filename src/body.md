@@ -353,7 +353,7 @@ calib_data_path = "/workspace/calibration/resnet50"
 # A calibration meta file such as "/workspace/calibration/resnet50.txt" can be used instead.
 
 keras_model_save_path = "/workspace/tf_models/resnet50" # directory to save the Tensorflow model
-keras_model.save(keras_model_save_path) # Save the model in the format of frozen graph. saved_model.pb file will be created in the directory.
+keras_model.save(keras_model_save_path) # Save the model in the format of. saved_model.pb file, which will be created in the directory.
 
 tflite_model = tf.lite.TFLiteConverter.from_saved_model(keras_model_save_path).convert()
 with open('/workspace/tf_models/resnet50.tflite', 'wb') as f:
@@ -383,7 +383,7 @@ calib_data_path = "/workspace/calibration/resnet50"
 # A calibration meta file such as "/workspace/calibration/resnet50.txt" can be used instead.
 
 keras_model_save_path = "/workspace/tf_models/resnet50" # directory to save the Tensorflow model
-keras_model.save(keras_model_save_path) # Save the model in the format of frozen graph. saved_model.pb file will be created in the directory.
+keras_model.save(keras_model_save_path) # Save the model in the format of. saved_model.pb file, which will be created in the directory.
 
 tflite_model = tf.lite.TFLiteConverter.from_saved_model(keras_model_save_path).convert()
 with open('/workspace/tf_models/resnet50.tflite', 'wb') as f:
