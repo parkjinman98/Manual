@@ -1,7 +1,7 @@
 -- Document Properties for title, author, etc.
 property["Document_Name"]			= "Model Compiler Suite for Aries™" -- Document Name
 property["IP_Version"]				= "v0.8.3" -- Version
-property["Comprehensive_IP_Title"]	= "Model Compiler Suite for Aries" -- Comprehensive IP Title. This will be used in the document title page.
+property["Main_Title"]	= "Model Compiler Suite for Aries" -- Comprehensive IP Title. This will be used in the document title page.
 property["IP_Name_First_Page"]		= "Developers Guide" -- IP Name for the first page
 property["Business_Unit"]			= "Algorithm" -- 
 property["IP_Name_Header"]			= "Developers Guide" -- IP Name for the header
