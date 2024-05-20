@@ -26,5 +26,6 @@ AddRevision("0.8.0", 2023, 11, 02, "Revised for v0.8.0")
 AddRevision("0.8.1", 2023, 12, 08, "Revised for v0.8.1")
 AddRevision("0.8.2", 2024, 02, 23, "Revised for v0.8.2")
 AddRevision("0.8.3", 2024, 03, 07, "Revised for v0.8.3")
+AddRevision("0.8.4", 2024, 05, 20, "Revised for v0.8.4")
 
 AddParagraph("[[src/body.md]]")

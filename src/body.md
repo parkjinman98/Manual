@@ -9,7 +9,14 @@ Inputs to qubee are a trained deep learning model, its input shape, and calibrat
 
 # Changelog
 
+## qubee v0.8.4 (May 2024)
+API
+    TF backend connected to ONNX backend by TF2ONNX
+Support more operations
+
 ## qubee v0.8.3 (March 2024)
+API
+    Support TF Lite backend
 
 ## qubee v0.8.2 (February 2024)
 
@@ -339,65 +346,78 @@ mxq_compile(
 ```
 
 ## Compiling TensorFlow/Keras Models
-Since Keras works as an interface for TensorFlow, models on the Keras framework can be converted to Mobilint IR via TensorFlow. First, we load and save the Keras/TensorFlow model into the format of the frozen graph, which ends with `.pb`. Then, with the directory containing the frozen graph, qubee will compile the model. The following code assumes the calibration dataset is prepared in the directory `/workspace/calibration/resnet50`.
+Since Keras works as an interface for TensorFlow, models on the Keras framework can be converted to Mobilint IR via TensorFlow. Currently, the qubee compiler supports TensorFlow models saved in the format of the SavedModel or frozen graph. For the SavedModel format, which includes the serialized model ending with `.pb`, the model can be directly compiled. For the frozen graph, the compiler requires the input node name and the output node name, which can be viewed by @<link:https://netron.app/;Netron>. The following codes assume the calibration dataset is prepared in the directory `/workspace/calibration/resnet50`.
 
-@<b>@<color:FF0000>Important@</color:FF0000>@</b> According to the annotations and old version instructions, the TensorFlow compilation should work by providing the directory containing the frozen graph or just the frozen graph file. However, the current version of qubee has some bugs in the TensorFlow parser. It is now fixed and will be released in the next version. For now, please use the ONNX or PyTorch model to compile the model.
 ```python
-""" Compile Tensorflow Lite model """ 
+""" Compile Keras/TensorFlow model in SavedModel format """
 from qubee import mxq_compile
 import tensorflow as tf
 
-keras_model = tf.keras.applications.resnet50.ResNet50() # Load a pretrained Keras model
-input_shape = (224, 224, 3) 
+keras_model = tf.keras.applications.resnet50.ResNet50() # Load a Keras model 
 calib_data_path = "/workspace/calibration/resnet50"
-# A calibration meta file such as "/workspace/calibration/resnet50.txt" can be used instead.
+# A calibration metadata file such as "/workspace/calibration/resnet50.txt" can be used instead.
 
-keras_model_save_path = "/workspace/tf_models/resnet50" # directory to save the Tensorflow model
-keras_model.save(keras_model_save_path) # Save the model in the format of. saved_model.pb file, which will be created in the directory.
-
-tflite_model = tf.lite.TFLiteConverter.from_saved_model(keras_model_save_path).convert()
-with open('/workspace/tf_models/resnet50.tflite', 'wb') as f:
-    f.write(tflite_model)
+keras_model_save_path = "/workspace/tf_models/resnet50" # directory to save the model
+keras_model.save(keras_model_save_path) # Save the model in the format of the frozen graph. saved_model.pb file will be created in the directory.
 
 mxq_compile(
-    model=keras_model_save_path+".tflite",
-    calib_data_path=calib_data_path,
-    backend="tflite",
-    save_path="resnet50.mxq",
+    model=keras_model_save_path,
+    calib_data_path=calib_data_path,
+    backend="tf",
+    save_path="resnet50.mxq",
+)
+```
+To test the model in the format of the frozen graph, download `MobileNet_v2_1.0_224` from the @<link:https://github.com/tensorflow/models/tree/master/research/slim; TensorFlow Model Garden> and save it in the directory `/workspace/tf_models/mobilenet_v2`. The following code assumes the calibration dataset is prepared in the directory `/workspace/calibration/resnet50`, which contains the calibration data that is compatible with the model `MobileNet`.
+@<b>Remark@</b> Compiling the model in the frozen graph format requires the input and output node name. When the input tensor name is `input`, it is recommended to set the input node name as `input:0`. In the case that the input tensor shape is unknown, the input shape should be set as `input:0[-1,224,224,3]`, where -1 indicates the batch dimension, and `[224,224,3]` is the input shape. The output argument should be set in the same way.
+```python
+""" Compile TensorFlow model in frozen graph format """
+from qubee import mxq_compile
+import tensorflow as tf
+
+calib_data_path = "/workspace/calibration/resnet50"
+# A calibration metadata file such as "/workspace/calibration/resnet50.txt" can be used instead.
+
+tf_model_save_path = "/workspace/tf_models/mobilenet_v2/mobilenet_v2_1.0_224_frozen.pb" # directory to save the model
+feed_dict = {"input": ["input:0[-1,224,224,3]"], "output": ["MobilenetV2/Predictions/Softmax:0"]}
+
+mxq_compile(
+    model=tf_model_save_path,
+    calib_data_path=calib_data_path,
+    backend="tf",
+    save_path="mobilenet_v2.mxq",
+    feed_dict=feed_dict
 )
 ```
 
 ## Compiling TensorFlow Lite Models
 The qubee compiler supports TensorFlow Lite models. With the given TensorFlow Lite model, the calibration dataset, and the backend, the model can be compiled into Mobilint IR. The following code assumes the calibration dataset is prepared in the directory `/workspace/calibration/resnet50`.
 
-@<b>@<color:FF0000>Important@</color:FF0000>@</b> Currently, the TensorFlow Lite model is not supported in the qubee compiler. Please use the ONNX or PyTorch model to compile the model.
-
 ```python
 """ Compile Tensorflow Lite model """ 
 from qubee import mxq_compile
 import tensorflow as tf
 
-keras_model = tf.keras.applications.resnet50.ResNet50() # Load a pretrained Keras model
+keras_model = tf.keras.applications.resnet50.ResNet50() # Load a pre-trained Keras model
 input_shape = (224, 224, 3) 
 calib_data_path = "/workspace/calibration/resnet50"
-# A calibration meta file such as "/workspace/calibration/resnet50.txt" can be used instead.
+# A calibration metadata file such as "/workspace/calibration/resnet50.txt" can be used instead.
 
 keras_model_save_path = "/workspace/tf_models/resnet50" # directory to save the Tensorflow model
-keras_model.save(keras_model_save_path) # Save the model in the format of. saved_model.pb file, which will be created in the directory.
+keras_model.save(keras_model_save_path) # Save the model in the format of the frozen graph. saved_model.pb file will be created in the directory.
 
-tflite_model = tf.lite.TFLiteConverter.from_saved_model(keras_model_save_path).convert()
+tflite_model = tf.lite.TFLiteConverter.from_saved_model(keras_model_save_path).convert() # Convert the model to TFLite format
 with open('/workspace/tf_models/resnet50.tflite', 'wb') as f:
-    f.write(tflite_model)
+    f.write(tflite_model)
 
 mxq_compile(
-    model=keras_model_save_path+".tflite",
-    calib_data_path=calib_data_path,
-    backend="tflite",
-    save_path="resnet50.mxq",
+    model=keras_model_save_path+".tflite",
+    calib_data_path=calib_data_path,
+    backend="tflite",
+    save_path="resnet50.mxq",
 )
 ```
 
-## Compling Models with Custom Input
+## Compling Models with Custom Input(ONNX/Torch/TensorFlow Frameworks)
 
 When the model lacks input shape information, qubee may generate the following error:
 ```bash
